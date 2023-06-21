@@ -1,0 +1,33 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <springProperty scope="context" name="app.name" source="spring.application.name"/>
+
+    <springProfile name="default">
+        <property name="LOG_HOME" value="."/>
+    </springProfile>
+
+    <appender name="ROOT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/spring.log</file>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                [%d{yyyy-MM-dd HH:mm:ss.SSS}][%level][${app.name},%X{X-B3-TraceId:--},%X{X-B3-SpanId:--}][%logger{50}][%X{X-URL:--}] %msg%n
+            </Pattern>
+        </layout>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${LOG_HOME}/spring.log.%d{yyyy-MM-dd}.%i
+            </fileNamePattern>
+            <MaxHistory>7</MaxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>1GB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+
+    <root level="INFO">
+        <appender-ref ref="ROOT_FILE"/>
+    </root>
+
+</configuration>

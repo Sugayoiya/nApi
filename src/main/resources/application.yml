@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: nintendo-server
+  config:
+    activate:
+      on-profile: default
+  data:
+    mongodb:
+      nintendo:
+        uri: mongodb://moko:Bensad28k@192.168.0.100:27017/nintendo?authSource=admin&authMechanism=SCRAM-SHA-256&maxPoolSize=10
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

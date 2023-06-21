@@ -1,0 +1,16 @@
+package kono.ene.napi.response.ns;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+public class LoginChallengeResponse {
+    @JsonProperty("login_url")
+    private String login_url;
+}
