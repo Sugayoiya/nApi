@@ -10,12 +10,12 @@ import kono.ene.napi.constant.MongoField;
 import kono.ene.napi.dao.entity.*;
 import kono.ene.napi.dao.repository.*;
 import kono.ene.napi.exception.BaseRuntimeException;
-import kono.ene.napi.response.ns.WebServiceAccessTokenResponse;
-import kono.ene.napi.util.Misc;
 import kono.ene.napi.request.AccountAccessTokenRequest;
 import kono.ene.napi.request.SessionRequest;
 import kono.ene.napi.request.UserInfoRequest;
 import kono.ene.napi.request.WebServiceRequest;
+import kono.ene.napi.response.ns.WebServiceAccessTokenResponse;
+import kono.ene.napi.util.Misc;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
@@ -231,9 +231,8 @@ public class NintendoServiceImpl implements NintendoService {
 
         String url = "https://api.accounts.nintendo.com/2.0.0/users/me";
         String response = doGet(url, headers);
-        JSONObject responseJson = JSONUtil.parseObj(response, true);
 
-        UserDo user = mongoTemplate.findAndModify(
+        return mongoTemplate.findAndModify(
                 Query.query(Criteria.where(MongoField.QID).is(qid)),
                 Update.fromDocument(Document.parse(response))
                         .set(MongoField.UPDATE_TIME, new Date())
@@ -241,8 +240,6 @@ public class NintendoServiceImpl implements NintendoService {
                 FindAndModifyOptions.options().upsert(true).returnNew(true),
                 UserDo.class
         );
-
-        return user;
     }
 
     @Override

@@ -6,6 +6,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Resource;
+import kono.ene.napi.config.GlobalConfigurage;
 import kono.ene.napi.dao.entity.GlobalConfigDo;
 import kono.ene.napi.dao.entity.SwitchUserDo;
 import kono.ene.napi.dao.repository.NintendoGlobalConfigDao;
@@ -14,6 +15,7 @@ import kono.ene.napi.response.ns.*;
 import kono.ene.napi.util.Misc;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,9 @@ public class NintendoSwitchServiceImpl implements NintendoSwitchService {
     private NintendoGlobalConfigDao nintendoGlobalConfigDao;
     @Resource
     private MongoTemplate mongoTemplate;
+    @Resource
+    @Qualifier("globalConfigDTO")
+    private GlobalConfigurage.GlobalConfigDTO globalConfig;
 
     private HttpResponse do_znc_call(Integer qid, String path, Map<String, Object> params) {
         SwitchUserDo switchUserDo = nintendoSwitchUserDao.findByQid(qid);
@@ -41,22 +46,20 @@ public class NintendoSwitchServiceImpl implements NintendoSwitchService {
         String url = "https://api-lp1.znc.srv.nintendo.net" + path;
         String guid = UUID.randomUUID().toString();
         Map<String, String> headers = new HashMap<>();
-        // TODO
-        headers.put("User-Agent", "com.nintendo.znca/2.5.2 (Android/7.1.2)");
+        headers.put("User-Agent", "com.nintendo.znca/" + globalConfig.getAppVersion() + " (Android/7.1.2)");
         headers.put("Accept-Encoding", "gzip");
         headers.put("Accept", "application/json");
         headers.put("Connection", "Keep-Alive");
         headers.put("Host", "api-lp1.znc.srv.nintendo.net");
-        // TODO
-        headers.put("X-ProductVersion", "2.5.2");
+        headers.put("X-ProductVersion", globalConfig.getAppVersion());
         headers.put("Content-Type", "application/json; charset=utf-8");
         headers.put("Authorization", "Bearer " + switchUserDo.getWebApiServerCredential().getAccessToken());
 
-        Map<String, Object> jsonbody = new HashMap<>();
-        jsonbody.put("parameter", params);
-        jsonbody.put("requestId", guid);
+        Map<String, Object> body = new HashMap<>();
+        body.put("parameter", params);
+        body.put("requestId", guid);
 
-        return Misc.doPost(url, JSONUtil.toJsonStr(jsonbody), headers);
+        return Misc.doPost(url, JSONUtil.toJsonStr(body), headers);
     }
 
     @Override

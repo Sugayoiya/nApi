@@ -16,6 +16,7 @@ public class NintendoSwitchController extends AbstractBaseController {
         return switchService.listWebServices(qid);
     }
 
+    // TODO
     @GetMapping("/nintendo_switch/announcements")
     public void announcements(@RequestParam Integer qid) {
         switchService.announcements(qid);
