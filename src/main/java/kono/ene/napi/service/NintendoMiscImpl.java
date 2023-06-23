@@ -24,8 +24,7 @@ public class NintendoMiscImpl implements NintendoMisc {
     private MongoTemplate mongoTemplate;
     @Override
     public void updateNintendoGlobalConfig() {
-        // TODO virtual currency
-        try (var ex = Executors.newFixedThreadPool(4)) {
+        try (var ex = Executors.newVirtualThreadPerTaskExecutor()) {
             CompletableFuture<String> nsoAppVersionFuture = CompletableFuture.supplyAsync(Misc::getNSOAppVersion, ex);
             CompletableFuture<String> nsoMainJsFuture = CompletableFuture.supplyAsync(Misc::getMainJsUrl, ex);
             CompletableFuture<String> nsoWebVersionFuture = nsoMainJsFuture.thenApply(Misc::getWebViewVersion);
