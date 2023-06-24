@@ -33,7 +33,7 @@ class MiscTest {
 
     @Test
     void callFApi() {
-        int qid = 21778445;
+        long qid = 21778445;
         String accessToken = nintendoService.refreshAccessToken(new AccountAccessTokenRequest(qid));
         UserDo userDo = nintendoService.userInfo(new UserInfoRequest(qid));
         String uuid = UUID.randomUUID().toString().replace("-", "");

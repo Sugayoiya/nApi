@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FriendRequest {
     @JsonProperty("qid")
-    private Integer qid;
+    private Long qid;
     @JsonProperty("friendCode")
     private String friendCode;
 }

@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountAccessTokenRequest {
-    private Integer qid;
+    private Long qid;
 }

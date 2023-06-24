@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class WebServicesResponse {
     @JsonProperty("qid")
-    private Integer qid;
+    private Long qid;
     @JsonProperty("web_services")
     private List<WebService> webServices;
 

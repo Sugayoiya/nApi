@@ -21,7 +21,7 @@ public class SwitchUserDo extends BaseDo {
     @Id
     private Long id;
     @Field("qid")
-    private Integer qid;
+    private Long qid;
     @Field("nsaId")
     private String nsaId;
     @Field("name")

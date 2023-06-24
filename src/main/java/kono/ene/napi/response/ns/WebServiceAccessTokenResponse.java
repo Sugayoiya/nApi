@@ -5,10 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Field;
-
-import java.util.List;
 
 import static kono.ene.napi.constant.MongoField.ACCESS_TOKEN;
 
@@ -18,7 +14,7 @@ import static kono.ene.napi.constant.MongoField.ACCESS_TOKEN;
 @Data
 public class WebServiceAccessTokenResponse {
     @JsonProperty("qid")
-    private Integer qid;
+    private Long qid;
     @JsonProperty("game_id")
     private Long gameId;
     @JsonProperty("game_uri")

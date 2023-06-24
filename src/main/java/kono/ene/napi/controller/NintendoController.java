@@ -25,7 +25,7 @@ public class NintendoController extends AbstractBaseController {
 
     @SneakyThrows
     @GetMapping("/login")
-    public ResponseDto<LoginChallengeResponse> login(@RequestParam Integer qid) {
+    public ResponseDto<LoginChallengeResponse> login(@RequestParam Long qid) {
         return ResponseDto.success(LoginChallengeResponse.builder()
                 .login_url(nintendoService.loginChallenge(qid))
                 .build());

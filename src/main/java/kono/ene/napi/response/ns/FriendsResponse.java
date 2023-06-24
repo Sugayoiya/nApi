@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class FriendsResponse {
     @JsonProperty("qid")
-    private Integer qid;
+    private Long qid;
     @JsonProperty("friends")
     private List<FriendsDTO> friends;
 

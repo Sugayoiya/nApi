@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class FriendCodeUrlResponse {
     @JsonProperty("qid")
-    private Integer qid;
+    private Long qid;
     @JsonProperty("url")
     private String url;
     @JsonProperty("friendCode")

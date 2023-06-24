@@ -18,7 +18,7 @@ public class UserDo extends BaseDo {
     @Id
     private String id;
     @Field("qid")
-    private Integer qid;
+    private Long qid;
 
     @Field("nickname")
     private String nickname;

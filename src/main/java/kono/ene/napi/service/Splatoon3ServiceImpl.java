@@ -20,7 +20,9 @@ import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static kono.ene.napi.constant.MongoField.*;
 import static kono.ene.napi.constant.SplatoonGraphQL.*;
@@ -52,7 +54,7 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
     }
 
     @Override
-    public String bulletToken(Integer qid) {
+    public String bulletToken(Long qid) {
 
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
         Assert.notNull(webAccessTokenDo, "webAccessTokenDo is null");
@@ -94,14 +96,14 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
     }
 
     @Override
-    public JSONObject get_tw_history_list(Integer qid) {
+    public JSONObject get_tw_history_list(Long qid) {
         WebAccessTokenDo webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(REGULAR_BATTLE_HISTORIES_QUERY);
         return createGraphqlRequest(webAccessTokenDo, RegularBattleHistoriesQuery, new HashMap<>());
     }
 
     @Override
-    public BattleHistoryResponse get_battle_history_list(Integer qid) {
+    public BattleHistoryResponse get_battle_history_list(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(LATEST_BATTLE_HISTORIES_QUERY);
         JSONObject jsonObject = createGraphqlRequest(webAccessTokenDo, LatestBattleHistoriesQuery, new HashMap<>());
@@ -109,35 +111,35 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
     }
 
     @Override
-    public JSONObject get_battle_history_detail(Integer qid, String id) {
+    public JSONObject get_battle_history_detail(Long qid, String id) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(VS_HISTORY_DETAIL_QUERY);
         return createGraphqlRequest(webAccessTokenDo, VsHistoryDetailQuery, new HashMap<>(Map.of("vsResultId", id)));
     }
 
     @Override
-    public JSONObject get_stage_schedule(Integer qid) {
+    public JSONObject get_stage_schedule(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(STAGE_SCHEDULE_QUERY);
         return createGraphqlRequest(webAccessTokenDo, StageScheduleQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_player_stats_simple(Integer qid) {
+    public JSONObject get_player_stats_simple(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(CONFIGURE_ANALYTICS_QUERY);
         return createGraphqlRequest(webAccessTokenDo, ConfigureAnalyticsQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_player_stats_full(Integer qid) {
+    public JSONObject get_player_stats_full(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(HISTORY_RECORD_QUERY);
         return createGraphqlRequest(webAccessTokenDo, HistoryRecordQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_salmon_run_stats(Integer qid) {
+    public JSONObject get_salmon_run_stats(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(COOP_HISTORY_QUERY);
         return createGraphqlRequest(webAccessTokenDo, CoopHistoryQuery, new HashMap<>());
@@ -145,42 +147,42 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
 
 
     @Override
-    public JSONObject get_current_splatfest(Integer qid) {
+    public JSONObject get_current_splatfest(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(USE_CURRENT_FEST_QUERY);
         return createGraphqlRequest(webAccessTokenDo, CurrentFestQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_splatfest_list(Integer qid) {
+    public JSONObject get_splatfest_list(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(FEST_RECORD_QUERY);
         return createGraphqlRequest(webAccessTokenDo, FestRecordQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_weapon_stats(Integer qid) {
+    public JSONObject get_weapon_stats(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(WEAPON_RECORD_QUERY);
         return createGraphqlRequest(webAccessTokenDo, WeaponRecordQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_fits(Integer qid) {
+    public JSONObject get_fits(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(MY_OUTFITS_QUERY);
         return createGraphqlRequest(webAccessTokenDo, MyOutfitsQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_maps_stats(Integer qid) {
+    public JSONObject get_maps_stats(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(STAGE_RECORD_QUERY);
         return createGraphqlRequest(webAccessTokenDo, StageRecordQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject do_store_order(Integer qid, String id, Boolean confirm) {
+    public JSONObject do_store_order(Long qid, String id, Boolean confirm) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(SALE_GEAR_DETAIL_ORDER_GESOTOWN_GEAR_MUTATION);
         return createGraphqlRequest(webAccessTokenDo, SaleGearDetailOrderGesotownGearMutation, new HashMap<>(Map
@@ -188,49 +190,49 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
     }
 
     @Override
-    public JSONObject get_store_items(Integer qid) {
+    public JSONObject get_store_items(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(GESOTOWN_QUERY);
         return createGraphqlRequest(webAccessTokenDo, GesotownQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_single_player_stats(Integer qid) {
+    public JSONObject get_single_player_stats(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(HERO_HISTORY_QUERY);
         return createGraphqlRequest(webAccessTokenDo, HeroHistoryQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_species_cur_weapon(Integer qid) {
+    public JSONObject get_species_cur_weapon(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(BATTLE_HISTORY_CURRENT_PLAYER_QUERY);
         return createGraphqlRequest(webAccessTokenDo, BattleHistoryCurrentPlayerQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_sr_history_list(Integer qid) {
+    public JSONObject get_sr_history_list(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(REFETCHABLE_COOP_HISTORY_COOP_RESULT_QUERY);
         return createGraphqlRequest(webAccessTokenDo, RefetchableCoopHistory_CoopResultQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_sr_history_detail(Integer qid, String id) {
+    public JSONObject get_sr_history_detail(Long qid, String id) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(COOP_HISTORY_DETAIL_QUERY);
         return createGraphqlRequest(webAccessTokenDo, CoopHistoryDetailQuery, new HashMap<>(Map.of("coopHistoryDetailId", id)));
     }
 
     @Override
-    public JSONObject get_outfits_common_data(Integer qid) {
+    public JSONObject get_outfits_common_data(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(MY_OUTFIT_COMMON_DATA_EQUIPMENTS_QUERY);
         return createGraphqlRequest(webAccessTokenDo, MyOutfitCommonDataEquipmentsQuery, new HashMap<>());
     }
 
     @Override
-    public JSONObject get_replay_list(Integer qid) {
+    public JSONObject get_replay_list(Long qid) {
         var webAccessTokenDo = switchWebAccessTokenDao.findByQidAndGameId(qid, SPLATOON3_ID);
 //        String queryHash = Misc.graphqlQuery.get(REPLAY_QUERY);
         return createGraphqlRequest(webAccessTokenDo, ReplayQuery, new HashMap<>());

@@ -14,7 +14,7 @@ public class SwitchUserSelfResponse {
     @JsonProperty("id")
     private Long id;
     @JsonProperty("qid")
-    private Integer qid;
+    private Long qid;
     @JsonProperty("nsaId")
     private String nsaId;
     @JsonProperty("imageUri")

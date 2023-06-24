@@ -27,7 +27,7 @@ import static kono.ene.napi.constant.MongoField.*;
 
 @Slf4j
 @Service
-public class NintendoSwitchServiceImpl implements NintendoSwitchService {
+public class NSwitchServiceImpl implements NSwitchService {
     @Resource
     private NintendoSwitchUserDao nintendoSwitchUserDao;
     @Resource
@@ -38,7 +38,7 @@ public class NintendoSwitchServiceImpl implements NintendoSwitchService {
     @Qualifier("globalConfigDTO")
     private GlobalConfigurage.GlobalConfigDTO globalConfig;
 
-    private HttpResponse do_znc_call(Integer qid, String path, Map<String, Object> params) {
+    private HttpResponse do_znc_call(Long qid, String path, Map<String, Object> params) {
         SwitchUserDo switchUserDo = nintendoSwitchUserDao.findByQid(qid);
         if (!path.startsWith("/")) {
             path = "/" + path;
@@ -63,7 +63,7 @@ public class NintendoSwitchServiceImpl implements NintendoSwitchService {
     }
 
     @Override
-    public WebServicesResponse listWebServices(Integer qid) {
+    public WebServicesResponse listWebServices(Long qid) {
         WebServicesResponse.WebServicesResponseBuilder response = WebServicesResponse.builder().qid(qid);
         try (HttpResponse httpResponse = do_znc_call(qid, "/v1/Game/ListWebServices", null)) {
             String body = httpResponse.body();
@@ -90,7 +90,7 @@ public class NintendoSwitchServiceImpl implements NintendoSwitchService {
     }
 
     @Override
-    public void announcements(Integer qid) {
+    public void announcements(Long qid) {
         try (HttpResponse httpResponse = do_znc_call(qid, "/v1/Announcement/List", null)) {
             String body = httpResponse.body();
             log.info("announcements success, body: {}", body);
@@ -98,7 +98,7 @@ public class NintendoSwitchServiceImpl implements NintendoSwitchService {
     }
 
     @Override
-    public FriendsResponse friendsList(Integer qid) {
+    public FriendsResponse friendsList(Long qid) {
         FriendsResponse.FriendsResponseBuilder response = FriendsResponse.builder().qid(qid);
         try (HttpResponse httpResponse = do_znc_call(qid, "/v3/Friend/List", null)) {
             String body = httpResponse.body();
@@ -126,7 +126,7 @@ public class NintendoSwitchServiceImpl implements NintendoSwitchService {
     }
 
     @Override
-    public FriendCodeUrlResponse createFriendCodeUrl(Integer qid) {
+    public FriendCodeUrlResponse createFriendCodeUrl(Long qid) {
         // TODO expire time figure out
         FriendCodeUrlResponse.FriendCodeUrlResponseBuilder response = FriendCodeUrlResponse.builder().qid(qid);
         try (HttpResponse httpResponse = do_znc_call(qid, "/v3/Friend/CreateFriendCodeUrl", null)) {
@@ -144,7 +144,7 @@ public class NintendoSwitchServiceImpl implements NintendoSwitchService {
     }
 
     @Override
-    public SwitchUserSelfResponse userSelf(Integer qid) {
+    public SwitchUserSelfResponse userSelf(Long qid) {
         SwitchUserSelfResponse.SwitchUserSelfResponseBuilder response = SwitchUserSelfResponse.builder().qid(qid);
         try (HttpResponse httpResponse = do_znc_call(qid, "/v3/User/ShowSelf", null)) {
             String body = httpResponse.body();
@@ -184,7 +184,7 @@ public class NintendoSwitchServiceImpl implements NintendoSwitchService {
     }
 
     @Override
-    public FriendResponse userByFriendCode(Integer qid, String friendCode) {
+    public FriendResponse userByFriendCode(Long qid, String friendCode) {
         Map<String, Object> params = new HashMap<>();
         params.put("friendCode", formatFriendCode(friendCode));
         try (HttpResponse httpResponse = do_znc_call(qid, "/v3/Friend/GetUserByFriendCode", params)) {
@@ -201,7 +201,7 @@ public class NintendoSwitchServiceImpl implements NintendoSwitchService {
     }
 
     @Override
-    public void sendFriendRequest(Integer qid, String friendCode) {
+    public void sendFriendRequest(Long qid, String friendCode) {
         FriendResponse friendResponse = userByFriendCode(qid, friendCode);
         if (friendResponse.getNsaId() != null) {
             Map<String, Object> params = new HashMap<>();

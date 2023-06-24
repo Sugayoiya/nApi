@@ -33,7 +33,9 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,7 +68,11 @@ public class NintendoServiceImpl implements NintendoService {
 
     @SneakyThrows
     @Override
-    public String loginChallenge(Integer qid) {
+    public String loginChallenge(Long qid) {
+        CodeChallengeDo codeChallengeDo = nintendoCodeChallengeDao.findByQid(qid);
+        if (Objects.isNull(codeChallengeDo) || Objects.isNull(codeChallengeDo.getSessionToken())) {
+            return "already bind";
+        }
         // Generate a random state value
         SecureRandom secureRandom = new SecureRandom();
         byte[] authStateBytes = new byte[36];
@@ -102,8 +108,19 @@ public class NintendoServiceImpl implements NintendoService {
                 Update.update("verify", authCodeVerifier).set("url", url).set(MongoField.UPDATE_TIME, now).setOnInsert(MongoField.CREATE_TIME, now),
                 FindAndModifyOptions.options().upsert(true).returnNew(true),
                 CodeChallengeDo.class);
-
         return url;
+    }
+
+    @Override
+    public void bind(Long qid, String redirectUrl) {
+        try (var ex = Executors.newVirtualThreadPerTaskExecutor()) {
+            CompletableFuture<String> sessionToken = CompletableFuture.supplyAsync(() -> sessionToken(qid, redirectUrl), ex);
+            CompletableFuture<String> refreshAccessToken = sessionToken.thenApplyAsync(session -> refreshAccessToken(qid), ex);
+            CompletableFuture<Void> userInfo = refreshAccessToken.thenAcceptAsync(accessToken -> userInfo(qid), ex);
+            userInfo.get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -117,10 +134,15 @@ public class NintendoServiceImpl implements NintendoService {
     }
 
     @Override
+    public String sessionToken(Long qid, String redirectUrl) {
+        return sessionToken(new SessionRequest(qid, redirectUrl));
+    }
+
+    @Override
     public String sessionToken(SessionRequest sessionRequest) {
         CodeChallengeDo nintendoCodeChallenge = nintendoCodeChallengeDao.findByQid(sessionRequest.getQid());
         if (nintendoCodeChallenge == null) {
-            return null;
+            throw new BaseRuntimeException(40001, "please login first");
         } else if (!StringUtils.hasLength(nintendoCodeChallenge.getSessionToken())) {
             String code = decodeUrl(sessionRequest.getRedirect_url());
 
@@ -153,6 +175,11 @@ public class NintendoServiceImpl implements NintendoService {
         } else {
             return nintendoCodeChallenge.getSessionToken();
         }
+    }
+
+    @Override
+    public String refreshAccessToken(Long qid) {
+        return refreshAccessToken(new AccountAccessTokenRequest(qid));
     }
 
     @Override
@@ -205,23 +232,27 @@ public class NintendoServiceImpl implements NintendoService {
         if (authDo == null || authDo.getAccessToken() == null || authDo.getRefreshTime() == null || authDo.getExpiresIn() == null) {
             return true;
         }
-        return authDo.getRefreshTime().getTime() + authDo.getExpiresIn() * 1000
-                < System.currentTimeMillis();
+        return authDo.getRefreshTime().getTime() + authDo.getExpiresIn() * 1000 < System.currentTimeMillis();
+    }
+
+    @Override
+    public void userInfo(Long qid) {
+        userInfo(new UserInfoRequest(qid));
     }
 
     @Override
     public UserDo userInfo(UserInfoRequest userInfo) {
-        Integer qid = userInfo.getQid();
+        Long qid = userInfo.getQid();
         AuthDo authDo = mongoTemplate.findOne(Query.query(Criteria.where(MongoField.QID).is(qid)), AuthDo.class);
         String accessToken;
         if (isAccessTokenExpired(authDo)) {
-            accessToken = refreshAccessToken(new AccountAccessTokenRequest(qid));
+            accessToken = refreshAccessToken(qid);
         } else {
             accessToken = authDo.getAccessToken();
         }
 
         Map<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", "Coral/2.5.2 (com.nintendo.znca; build:1999; iOS 15.5.0) Alamofire/5.4.4");
+        headers.put("User-Agent", "Coral/" + globalConfig.getAppVersion() + " (com.nintendo.znca; build:1999; iOS 15.5.0) Alamofire/5.4.4");
         headers.put("Accept", "application/json");
         headers.put("Accept-Language", "zh-CN");
         headers.put("Authorization", "Bearer " + accessToken);
@@ -243,182 +274,212 @@ public class NintendoServiceImpl implements NintendoService {
     }
 
     @Override
+    public void nintendo_switch_account(Long qid) {
+        nintendo_switch_account(new UserInfoRequest(qid));
+    }
+
+    @Override
     public SwitchUserDo nintendo_switch_account(UserInfoRequest userInfo) {
-        Integer qid = userInfo.getQid();
-        AuthDo authDo = nintendoAuthDao.findByQid(qid);
-        UserDo userDo = nintendoUserDao.findByQid(qid);
+        Long qid = userInfo.getQid();
+        try (var ex = Executors.newVirtualThreadPerTaskExecutor()) {
+            CompletableFuture<String> accessTokenFuture = CompletableFuture.supplyAsync(() -> refreshAccessToken(qid), ex);
+            CompletableFuture<UserDo> userDoFuture = CompletableFuture.supplyAsync(() -> userInfo(userInfo), ex);
 
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        String accessToken = authDo.getAccessToken();
-        String language = userDo.getLanguage();
+            String uuid = UUID.randomUUID().toString().replace("-", "");
+            int f_step = 1;
 
-        int f_step = 1;
-        Misc.FApiResult fResult = Misc.callFApi(accessToken, f_step, uuid, userDo.getId());
+            CompletableFuture<Misc.FApiResult> fResultFuture = accessTokenFuture.thenCombine(
+                    userDoFuture,
+                    (accessToken, userDo) -> Misc.callFApi(accessToken, f_step, uuid, userDo.getId()));
 
-        String f = fResult.getF();
-        String f_timestamp = fResult.getTimestamp();
-        String f_request_id = fResult.getRequest_id();
+            CompletableFuture<String> bodyFuture = CompletableFuture.allOf(accessTokenFuture, userDoFuture, fResultFuture).thenApplyAsync((v) -> {
+                Misc.FApiResult fResult = fResultFuture.join();
+                UserDo userDo = userDoFuture.join();
+                String accessToken = accessTokenFuture.join();
 
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Host", "api-lp1.znc.srv.nintendo.net");
-        headers.put("Accept-Language", language);
-        headers.put("User-Agent", "com.nintendo.znca/" + globalConfig.getAppVersion() + " (Android/7.1.2)");
-        headers.put("Accept", "application/json");
-        headers.put("X-ProductVersion", globalConfig.getAppVersion());
-        headers.put("Content-Type", "application/json; charset=utf-8");
-        headers.put("Connection", "Keep-Alive");
-        headers.put("Authorization", "Bearer");
-        headers.put("X-Platform", "Android");
-        headers.put("Accept-Encoding", "gzip");
+                String f = fResult.getF();
+                String f_timestamp = fResult.getTimestamp();
+                String f_request_id = fResult.getRequest_id();
 
-        String bodyJsonStr = JSONUtil.toJsonStr(MapUtil.builder()
-                .put("parameter", MapUtil.builder()
-                        .put("f", f)
-                        .put("naIdToken", accessToken)
-                        .put("timestamp", Long.parseLong(f_timestamp))
-                        .put("requestId", f_request_id)
-                        .put("naCountry", userDo.getCountry())
-                        .put("naBirthday", userDo.getBirthday())
-                        .put("language", language)
-                        .build())
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Host", "api-lp1.znc.srv.nintendo.net");
+                headers.put("Accept-Language", userDo.getLanguage());
+                headers.put("User-Agent", "com.nintendo.znca/" + globalConfig.getAppVersion() + " (Android/7.1.2)");
+                headers.put("Accept", "application/json");
+                headers.put("X-ProductVersion", globalConfig.getAppVersion());
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                headers.put("Connection", "Keep-Alive");
+                headers.put("Authorization", "Bearer");
+                headers.put("X-Platform", "Android");
+                headers.put("Accept-Encoding", "gzip");
+
+                String bodyJsonStr = JSONUtil.toJsonStr(MapUtil.builder()
+                        .put("parameter", MapUtil.builder()
+                                .put("f", f)
+                                .put("naIdToken", accessToken)
+                                .put("timestamp", Long.parseLong(f_timestamp))
+                                .put("requestId", f_request_id)
+                                .put("naCountry", userDo.getCountry())
+                                .put("naBirthday", userDo.getBirthday())
+                                .put("language", userDo.getLanguage())
+                                .build())
+                        .build());
+
+                String url = "https://api-lp1.znc.srv.nintendo.net/v1/Account/Login";
+                return doPost(url, null, headers, bodyJsonStr);
+            }, ex);
+
+            CompletableFuture<SwitchUserDo> switchUserDoFuture = bodyFuture.thenCombineAsync(fResultFuture, (b, f) -> {
+                JSONObject responseJson = JSONUtil.parseObj(b);
+                Integer status = responseJson.getInt("status");
+                if (status == 9404) {
+                    log.warn("nintendo accessToken expired, response: {}", b);
+                    throw new RuntimeException("nintendo_switch_account token expired");
+                } else if (status != 0) {
+                    log.error("nintendo_switch_account error, response: {}", b);
+                    throw new RuntimeException("nintendo_switch_account error");
+                }
+
+                JSONObject result = responseJson.getJSONObject("result");
+                JSONObject profile = result.getJSONObject("user").putOnce(QID, qid);
+
+                Set<String> webApiCredential = result.getJSONObject(WEB_API_SERVER_CREDENTIAL).keySet();
+                Set<String> fc_keys = result.getJSONObject(FIREBASE_CREDENTIAL).keySet();
+
+                Update update = Update.fromDocument(Document.parse(profile.toString()))
+                        .set(UPDATE_TIME, new Date())
+                        .set(F_RESULT + "." + F_STEP, f_step)
+                        .set(F_RESULT + "." + REQUEST_ID, f.getRequest_id())
+                        .set(F_RESULT + "." + TIMESTAMP, f.getTimestamp())
+                        .set(F_RESULT + "." + F, f.getF())
+                        .setOnInsert(CREATE_TIME, new Date());
+
+                for (String key : webApiCredential) {
+                    update.set(WEB_API_SERVER_CREDENTIAL + "." + key, result.getJSONObject(WEB_API_SERVER_CREDENTIAL).get(key));
+                }
+                for (String key : fc_keys) {
+                    update.set(FIREBASE_CREDENTIAL + "." + key, result.getJSONObject(FIREBASE_CREDENTIAL).get(key));
+                }
+
+                update.set(WEB_API_SERVER_CREDENTIAL + "." + UPDATE_TIME, new Date())
+                        .set(FIREBASE_CREDENTIAL + "." + UPDATE_TIME, new Date())
+                        .setOnInsert(WEB_API_SERVER_CREDENTIAL + "." + CREATE_TIME, new Date())
+                        .setOnInsert(FIREBASE_CREDENTIAL + "." + CREATE_TIME, new Date());
+
+                SwitchUserDo switchUser = mongoTemplate.findAndModify(
+                        Query.query(Criteria.where(MongoField.QID).is(qid)),
+                        update,
+                        FindAndModifyOptions.options().upsert(true).returnNew(true),
+                        SwitchUserDo.class);
+                Assert.notNull(switchUser, "switchUser is null");
+                return switchUser;
+            }, ex);
+
+            return switchUserDoFuture.get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new BaseRuntimeException(40002, "nintendo_switch_account error", e);
+        }
+
+    }
+
+    @Override
+    public WebServiceAccessTokenResponse web_service_token(Long qid, String gameStr) {
+        return web_service_token(WebServiceRequest.builder()
+                .qid(qid).gameStr(gameStr)
                 .build());
-
-        String url = "https://api-lp1.znc.srv.nintendo.net/v3/Account/Login";
-        String response = doPost(url, null, headers, bodyJsonStr);
-
-        JSONObject responseJson = JSONUtil.parseObj(response);
-        Integer status = responseJson.getInt("status");
-        if (status == 9404) {
-            log.warn("nintendo accessToken expired, response: {}", response);
-            throw new RuntimeException("nintendo_switch_account token expired");
-        } else if (status != 0) {
-            log.error("nintendo_switch_account error, response: {}", response);
-            throw new RuntimeException("nintendo_switch_account error");
-        }
-
-        JSONObject result = responseJson.getJSONObject("result");
-        JSONObject profile = result.getJSONObject("user").putOnce(QID, qid);
-
-        Set<String> webApiCredential = result.getJSONObject(WEB_API_SERVER_CREDENTIAL).keySet();
-        Set<String> fc_keys = result.getJSONObject(FIREBASE_CREDENTIAL).keySet();
-
-        Update update = Update.fromDocument(Document.parse(profile.toString()))
-                .set(UPDATE_TIME, new Date())
-                .set(F_RESULT + "." + F_STEP, f_step)
-                .set(F_RESULT + "." + REQUEST_ID, f_request_id)
-                .set(F_RESULT + "." + TIMESTAMP, f_timestamp)
-                .set(F_RESULT + "." + F, f)
-                .setOnInsert(CREATE_TIME, new Date());
-
-        for (String key : webApiCredential) {
-            update.set(WEB_API_SERVER_CREDENTIAL + "." + key, result.getJSONObject(WEB_API_SERVER_CREDENTIAL).get(key));
-        }
-        for (String key : fc_keys) {
-            update.set(FIREBASE_CREDENTIAL + "." + key, result.getJSONObject(FIREBASE_CREDENTIAL).get(key));
-        }
-
-        update.set(WEB_API_SERVER_CREDENTIAL + "." + UPDATE_TIME, new Date())
-                .set(FIREBASE_CREDENTIAL + "." + UPDATE_TIME, new Date())
-                .setOnInsert(WEB_API_SERVER_CREDENTIAL + "." + CREATE_TIME, new Date())
-                .setOnInsert(FIREBASE_CREDENTIAL + "." + CREATE_TIME, new Date());
-
-        SwitchUserDo switchUser = mongoTemplate.findAndModify(
-                Query.query(Criteria.where(MongoField.QID).is(qid)),
-                update,
-                FindAndModifyOptions.options().upsert(true).returnNew(true),
-                SwitchUserDo.class);
-
-        assert switchUser != null;
-        return switchUser;
     }
 
     @Override
     public WebServiceAccessTokenResponse web_service_token(WebServiceRequest webServiceRequest) {
-        Integer qid = webServiceRequest.getQid();
-        Optional<GlobalConfigDo> nintendoGlobalConfig = nintendoGlobalConfigDao.findById("nintendo_global_config");
-        if (nintendoGlobalConfig.isPresent()) {
-            GlobalConfigDo configDo = nintendoGlobalConfig.get();
-            final AtomicReference<GlobalConfigDo.WebService> webService = new AtomicReference<>();
-            configDo.getWebServices().stream()
-                    .filter(ws -> ws.getName().equals(webServiceRequest.getGameStr()))
-                    .findFirst().ifPresent(webService::set);
-            GlobalConfigDo.WebService webServiceGet = webService.get();
-            if (webServiceGet == null) {
-                throw new RuntimeException("web_service_token gameStr error");
+        Long qid = webServiceRequest.getQid();
+        GlobalConfigurage.GlobalConfigDTO.ServiceConfig webService = globalConfig.getWebServices().stream()
+                .filter(ws -> ws.getName().equals(webServiceRequest.getGameStr()))
+                .findFirst().orElseThrow(() -> new RuntimeException("web_service_token gameStr error"));
+
+        var webAccessToken = nintendoSwitchWebAccessTokenDao.findByQidAndGameId(qid, webService.getId());
+        if (webAccessToken != null) {
+            // check expire
+            if (webAccessToken.getRefreshTime().getTime() + webAccessToken.getExpiresIn() * 1000 > System.currentTimeMillis()) {
+                return WebServiceAccessTokenResponse.builder()
+                        .qid(qid).gameId(webService.getId()).gameName(webService.getName())
+                        .gameUri(webService.getUrl()).accessToken(webAccessToken.getAccessToken())
+                        .imageUri(webService.getImageUrl()).build();
             }
-            var webAccessToken = nintendoSwitchWebAccessTokenDao.findByQidAndGameId(qid, webServiceGet.getId());
-            if (webAccessToken != null) {
-                // check expire
-                if (webAccessToken.getRefreshTime().getTime() + webAccessToken.getExpiresIn() * 1000 > System.currentTimeMillis()) {
-                    return WebServiceAccessTokenResponse.builder()
-                            .qid(qid).gameId(webServiceGet.getId()).gameName(webServiceGet.getName())
-                            .gameUri(webServiceGet.getUri()).accessToken(webAccessToken.getAccessToken())
-                            .imageUri(webServiceGet.getImageUri()).build();
-                }
-            }
-            UserDo userDo = nintendoUserDao.findByQid(qid);
-            SwitchUserDo switchUserDo = nintendoSwitchUserDao.findByQid(qid);
-            SwitchUserDo.FResult fResult = switchUserDo.getFResult();
-            String accessToken = switchUserDo.getWebApiServerCredential().getAccessToken();
+        }
+
+        try (var ex = Executors.newVirtualThreadPerTaskExecutor()) {
+            CompletableFuture<UserDo> userDoFuture = CompletableFuture.supplyAsync(() -> nintendoUserDao.findByQid(qid), ex);
+            CompletableFuture<SwitchUserDo> switchUserDoFuture = CompletableFuture.supplyAsync(() -> nintendoSwitchUserDao.findByQid(qid), ex);
 
             int f_step = 2;
-            Misc.FApiResult fApiResult = Misc.callFApi(accessToken, f_step, fResult.getRequestId(), userDo.getId());
+            CompletableFuture<Misc.FApiResult> fApiResultFuture = switchUserDoFuture.thenCombineAsync(userDoFuture, (s, u) -> {
+                String accessToken = s.getWebApiServerCredential().getAccessToken();
+                return Misc.callFApi(accessToken, f_step, s.getFResult().getRequestId(), u.getId());
+            }, ex);
 
-            Map<String, String> headers = new HashMap<>();
-            headers.put("X-Platform", "Android");
-            headers.put("X-ProductVersion", configDo.getAppVersion());
-            headers.put("Authorization", "Bearer " + accessToken);
-            headers.put("Content-Type", "application/json; charset=utf-8");
-            headers.put("Content-Length", "391");
-            headers.put("Accept-Encoding", "gzip");
-            headers.put("User-Agent", "com.nintendo.znca/" + configDo.getAppVersion() + "(Android/7.1.2)");
+            CompletableFuture<String> bodyFuture = fApiResultFuture.thenCombineAsync(switchUserDoFuture, (f, s) -> {
+                String accessToken = s.getWebApiServerCredential().getAccessToken();
 
-            Map<String, Object> parameter = new HashMap<>();
-            parameter.put("f", fApiResult.getF());
-            parameter.put("id", webServiceGet.getId());
-            parameter.put("registrationToken", accessToken);
-            parameter.put("requestId", fApiResult.getRequest_id());
-            parameter.put("timestamp", fApiResult.getTimestamp());
+                Map<String, String> headers = new HashMap<>();
+                headers.put("X-Platform", "Android");
+                headers.put("X-ProductVersion", globalConfig.getAppVersion());
+                headers.put("Authorization", "Bearer " + accessToken);
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                headers.put("Content-Length", "391");
+                headers.put("Accept-Encoding", "gzip");
+                headers.put("User-Agent", "com.nintendo.znca/" + globalConfig.getAppVersion() + "(Android/7.1.2)");
 
-            Map<String, Object> body = new HashMap<>();
-            body.put("parameter", parameter);
+                Map<String, Object> parameter = new HashMap<>();
+                parameter.put("f", f.getF());
+                parameter.put("id", webService.getId());
+                parameter.put("registrationToken", accessToken);
+                parameter.put("requestId", f.getRequest_id());
+                parameter.put("timestamp", f.getTimestamp());
 
-            String url = "https://api-lp1.znc.srv.nintendo.net/v2/Game/GetWebServiceToken";
+                Map<String, Object> body = new HashMap<>();
+                body.put("parameter", parameter);
 
-            String response = doPost(url, headers, JSONUtil.toJsonStr(body));
-            JSONObject result = JSONUtil.parseObj(response);
-            if (result.getInt("status") != 0) {
-                log.error("web_service_token error, response: {}", result);
-                throw new BaseRuntimeException(40002, "web_service_token error");
-            }
-            JSONObject webServiceTokenJson = result.getJSONObject("result");
+                String url = "https://api-lp1.znc.srv.nintendo.net/v2/Game/GetWebServiceToken";
 
-            Date now = new Date();
-            Query query = Query.query(Criteria.where(QID).is(qid).and(GAME_ID).is(webServiceGet.getId()));
-            Update update = Update.update(ACCESS_TOKEN, webServiceTokenJson.getStr("accessToken"))
-                    .set(EXPIRES_IN, webServiceTokenJson.getInt("expiresIn"))
-                    .set(UPDATE_TIME, now)
-                    .set(REFRESH_TIME, now)
-                    .set(LANGUAGE, userDo.getLanguage())
-                    .set(COUNTRY, userDo.getCountry())
-                    .setOnInsert(GAME_ID, webServiceGet.getId())
-                    .setOnInsert(GAME_URI, webServiceGet.getUri())
-                    .setOnInsert(GAME_NAME, webServiceGet.getName())
-                    .setOnInsert(IMAGE_URI, webServiceGet.getImageUri())
-                    .setOnInsert(QID, qid)
-                    .setOnInsert(CREATE_TIME, now);
-            var switchWebAccessTokenDo = mongoTemplate.findAndModify(query, update,
-                    FindAndModifyOptions.options().upsert(true).returnNew(true),
-                    WebAccessTokenDo.class);
+                return doPost(url, headers, JSONUtil.toJsonStr(body));
+            }, ex);
 
-            log.info("web_service_token result:{}", switchWebAccessTokenDo);
+            CompletableFuture<WebServiceAccessTokenResponse> webServiceTokenFuture = bodyFuture.thenCombineAsync(userDoFuture, (b, u) -> {
+                JSONObject result = JSONUtil.parseObj(b);
+                if (result.getInt("status") != 0) {
+                    throw new RuntimeException("web_service_token error");
+                }
+                JSONObject webServiceTokenJson = result.getJSONObject("result");
+                Date now = new Date();
+                Query query = Query.query(Criteria.where(QID).is(qid).and(GAME_ID).is(webService.getId()));
+                Update update = Update.update(ACCESS_TOKEN, webServiceTokenJson.getStr("accessToken"))
+                        .set(EXPIRES_IN, webServiceTokenJson.getInt("expiresIn"))
+                        .set(UPDATE_TIME, now)
+                        .set(REFRESH_TIME, now)
+                        .set(LANGUAGE, u.getLanguage())
+                        .set(COUNTRY, u.getCountry())
+                        .setOnInsert(GAME_ID, webService.getId())
+                        .setOnInsert(GAME_URI, webService.getUrl())
+                        .setOnInsert(GAME_NAME, webService.getName())
+                        .setOnInsert(IMAGE_URI, webService.getImageUrl())
+                        .setOnInsert(QID, qid)
+                        .setOnInsert(CREATE_TIME, now);
 
-            Assert.notNull(switchWebAccessTokenDo, "web_service_token error");
-            return WebServiceAccessTokenResponse.builder()
-                    .qid(qid).gameId(switchWebAccessTokenDo.getGameId()).gameName(switchWebAccessTokenDo.getGameName())
-                    .gameUri(switchWebAccessTokenDo.getGameUri()).accessToken(switchWebAccessTokenDo.getAccessToken())
-                    .imageUri(switchWebAccessTokenDo.getImageUri()).build();
+                var switchWebAccessTokenDo = mongoTemplate.findAndModify(query, update,
+                        FindAndModifyOptions.options().upsert(true).returnNew(true),
+                        WebAccessTokenDo.class);
+
+                log.info("web_service_token result:{}", switchWebAccessTokenDo);
+
+                Assert.notNull(switchWebAccessTokenDo, "web_service_token error");
+                return WebServiceAccessTokenResponse.builder()
+                        .qid(qid).gameId(switchWebAccessTokenDo.getGameId()).gameName(switchWebAccessTokenDo.getGameName())
+                        .gameUri(switchWebAccessTokenDo.getGameUri()).accessToken(switchWebAccessTokenDo.getAccessToken())
+                        .imageUri(switchWebAccessTokenDo.getImageUri()).build();
+            }, ex);
+            return webServiceTokenFuture.get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new BaseRuntimeException(40003, "web_service_token error", e);
         }
-        throw new BaseRuntimeException(40002, "web_service_token error");
     }
 }

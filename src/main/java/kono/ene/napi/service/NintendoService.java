@@ -12,15 +12,27 @@ import java.security.NoSuchAlgorithmException;
 
 public interface NintendoService {
 
-    String loginChallenge(Integer qid) throws NoSuchAlgorithmException;
+    String loginChallenge(Long qid) throws NoSuchAlgorithmException;
+
+    void bind(Long qid, String redirectUrl);
+
+    String sessionToken(Long qid, String redirectUrl);
 
     String sessionToken(SessionRequest sessionRequest);
 
+    String refreshAccessToken(Long qid);
+
     String refreshAccessToken(AccountAccessTokenRequest accountAccessTokenRequest);
+
+    void userInfo(Long qid);
 
     UserDo userInfo(UserInfoRequest userInfo);
 
+    void nintendo_switch_account(Long qid);
+
     SwitchUserDo nintendo_switch_account(UserInfoRequest userInfo);
+
+    WebServiceAccessTokenResponse web_service_token(Long qid, String gameStr);
 
     WebServiceAccessTokenResponse web_service_token(WebServiceRequest webServiceRequest);
 }

@@ -20,9 +20,8 @@ public class WebAccessTokenDo extends BaseDo {
     @Id
     private String id;
     @Field("qid")
-    private Integer qid;
+    private Long qid;
     @Field("game_id")
-
     private Long gameId;
     @Field("game_uri")
     private String gameUri;

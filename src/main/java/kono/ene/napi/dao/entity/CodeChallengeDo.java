@@ -18,7 +18,7 @@ public class CodeChallengeDo extends BaseDo {
     private String id;
 
     @Field(MongoField.QID)
-    private Integer qid;
+    private Long qid;
 
     private String verify;
 

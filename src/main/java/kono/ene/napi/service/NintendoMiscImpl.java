@@ -27,7 +27,7 @@ public class NintendoMiscImpl implements NintendoMisc {
         try (var ex = Executors.newVirtualThreadPerTaskExecutor()) {
             CompletableFuture<String> nsoAppVersionFuture = CompletableFuture.supplyAsync(Misc::getNSOAppVersion, ex);
             CompletableFuture<String> nsoMainJsFuture = CompletableFuture.supplyAsync(Misc::getMainJsUrl, ex);
-            CompletableFuture<String> nsoWebVersionFuture = nsoMainJsFuture.thenApply(Misc::getWebViewVersion);
+            CompletableFuture<String> nsoWebVersionFuture = nsoMainJsFuture.thenApplyAsync(Misc::getWebViewVersion);
 
             String nsoAppVersion = nsoAppVersionFuture.get();
             String nsoWebViewVersion = nsoWebVersionFuture.get();

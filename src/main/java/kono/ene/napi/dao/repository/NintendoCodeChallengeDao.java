@@ -6,5 +6,5 @@ import kono.ene.napi.dao.entity.CodeChallengeDo;
 
 
 public interface NintendoCodeChallengeDao extends BaseRepo<CodeChallengeDo, String> {
-    CodeChallengeDo findByQid(Integer qid);
+    CodeChallengeDo findByQid(Long qid);
 }

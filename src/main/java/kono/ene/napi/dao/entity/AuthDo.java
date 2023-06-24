@@ -19,7 +19,7 @@ public class AuthDo extends BaseDo {
     @Id
     private String id;
     @Field(MongoField.QID)
-    private Integer qid;
+    private Long qid;
     // ACCESS_TOKEN
     @Field(MongoField.ACCESS_TOKEN)
     private String accessToken;

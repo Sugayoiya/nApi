@@ -70,6 +70,43 @@
             <version>1.15.3</version>
         </dependency>
 
+        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.telegram/telegrambots &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.telegram</groupId>-->
+        <!--            <artifactId>telegrambots</artifactId>-->
+        <!--            <version>6.7.0</version>-->
+        <!--        </dependency>-->
+
+        <!-- https://mvnrepository.com/artifact/org.telegram/telegrambots -->
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots</artifactId>
+            <version>6.7.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambotsextensions</artifactId>
+            <version>6.7.0</version>
+        </dependency>
+
+
+        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.github.unafraid.telegram-apis/CoreAPI &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.github.unafraid.telegram-apis</groupId>-->
+        <!--            <artifactId>CoreAPI</artifactId>-->
+        <!--            <version>1.0.14</version>-->
+        <!--        </dependency>-->
+
+        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.github.unafraid.telegram-apis/InlineMenuAPI &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.github.unafraid.telegram-apis</groupId>-->
+        <!--            <artifactId>InlineMenuAPI</artifactId>-->
+        <!--            <version>1.0.14</version>-->
+        <!--        </dependency>-->
+
+
     </dependencies>
 
 <!--    <dependencyManagement>-->
