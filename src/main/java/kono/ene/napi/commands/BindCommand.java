@@ -14,8 +14,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Slf4j
 @Component
 public class BindCommand extends BotCommand {
-    private static final String COMMAND_IDENTIFIER = "session";
-    private static final String COMMAND_DESCRIPTION = "copy the link address, and paste it behind /session";
+    private static final String COMMAND_IDENTIFIER = "bind";
+    private static final String COMMAND_DESCRIPTION = "copy the link address, and paste it behind /bind, after that you can use /account to login";
     private static final String LOG_TAG = "LOGIN_COMMAND";
 
     @Resource

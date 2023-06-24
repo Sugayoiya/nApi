@@ -45,14 +45,14 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
 
     @PostConstruct
     private void postRegister() {
+        HelpCommand helpCommand = new HelpCommand();
+        register(helpCommand);
+
         register(loginChallengeCommand);
         register(bindCommand);
         register(userMeCommand);
         register(accountCommand);
         register(splat3Command);
-
-        HelpCommand helpCommand = new HelpCommand();
-        register(helpCommand);
 
         registerDefaultAction((absSender, message) -> {
             SendMessage commandUnknownMessage = new SendMessage();

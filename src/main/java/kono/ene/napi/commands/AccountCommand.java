@@ -15,7 +15,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Component
 public class AccountCommand extends BotCommand {
     private static final String COMMAND_IDENTIFIER = "account";
-    private static final String COMMAND_DESCRIPTION = "login nintendo switch account";
+    private static final String COMMAND_DESCRIPTION = "login nintendo switch account, then you can use /splat3 | /other command";
     private static final String LOG_TAG = "ACCOUNT_COMMAND";
 
     @Resource

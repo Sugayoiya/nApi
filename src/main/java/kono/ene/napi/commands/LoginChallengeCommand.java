@@ -17,7 +17,7 @@ import java.security.NoSuchAlgorithmException;
 @Component
 public class LoginChallengeCommand extends BotCommand {
     private static final String COMMAND_IDENTIFIER = "login";
-    private static final String COMMAND_DESCRIPTION = "generate login link, click to log in, right click the \"Select this account\" button, copy the link address, and paste it behind /session ";
+    private static final String COMMAND_DESCRIPTION = "generate login link, click to log in, right click the \"Select this account\" button, copy the link address, and paste it behind /bind ";
     private static final String LOG_TAG = "LOGIN_COMMAND";
 
     @Resource
