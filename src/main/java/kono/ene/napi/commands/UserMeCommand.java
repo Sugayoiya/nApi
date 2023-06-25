@@ -1,10 +1,10 @@
 package kono.ene.napi.commands;
 
 import jakarta.annotation.Resource;
-import kono.ene.napi.service.NintendoService;
+import kono.ene.napi.commands.base.OrderedCommand;
+import kono.ene.napi.service.nintendo.NintendoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -13,16 +13,19 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 @Component
-public class UserMeCommand extends BotCommand {
+public class UserMeCommand extends OrderedCommand {
     private static final String COMMAND_IDENTIFIER = "userme";
     private static final String COMMAND_DESCRIPTION = "update user info";
     private static final String LOG_TAG = "USER_ME_COMMAND";
+
+    private static final String GROUP = "nintendo";
+    private static final int ORDER = 2;
 
     @Resource
     private NintendoService nintendoService;
 
     public UserMeCommand() {
-        super(COMMAND_IDENTIFIER, COMMAND_DESCRIPTION);
+        super(COMMAND_IDENTIFIER, COMMAND_DESCRIPTION, GROUP, ORDER);
     }
 
     @Override

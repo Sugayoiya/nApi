@@ -1,10 +1,10 @@
 package kono.ene.napi.commands;
 
 import jakarta.annotation.Resource;
-import kono.ene.napi.service.NintendoService;
+import kono.ene.napi.commands.base.OrderedCommand;
+import kono.ene.napi.service.nintendo.NintendoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -13,16 +13,18 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 @Component
-public class Splat3Command extends BotCommand {
+public class Splat3Command extends OrderedCommand {
     private static final String COMMAND_IDENTIFIER = "splat3";
     private static final String COMMAND_DESCRIPTION = "splat3 webservice token";
     private static final String LOG_TAG = "SPLAT3_COMMAND";
 
+    private static final String GROUP = "splatoon3";
+    private static final int ORDER = 0;
     @Resource
     private NintendoService nintendoService;
 
     public Splat3Command() {
-        super(COMMAND_IDENTIFIER, COMMAND_DESCRIPTION);
+        super(COMMAND_IDENTIFIER, COMMAND_DESCRIPTION, GROUP, ORDER);
     }
 
     @Override

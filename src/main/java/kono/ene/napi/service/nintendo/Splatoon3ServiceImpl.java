@@ -1,4 +1,4 @@
-package kono.ene.napi.service;
+package kono.ene.napi.service.nintendo;
 
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.http.HttpRequest;

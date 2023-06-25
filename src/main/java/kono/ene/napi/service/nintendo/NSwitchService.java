@@ -1,4 +1,4 @@
-package kono.ene.napi.service;
+package kono.ene.napi.service.nintendo;
 
 import kono.ene.napi.response.ns.*;
 

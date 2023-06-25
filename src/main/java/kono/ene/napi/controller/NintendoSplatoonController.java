@@ -3,7 +3,7 @@ package kono.ene.napi.controller;
 import cn.hutool.json.JSONObject;
 import jakarta.annotation.Resource;
 import kono.ene.napi.response.splat3.*;
-import kono.ene.napi.service.Splatoon3Service;
+import kono.ene.napi.service.nintendo.Splatoon3Service;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

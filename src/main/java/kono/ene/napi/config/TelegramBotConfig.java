@@ -1,7 +1,7 @@
 package kono.ene.napi.config;
 
 import jakarta.annotation.Resource;
-import kono.ene.napi.service.CommandsHandler;
+import kono.ene.napi.service.telegram.CommandsHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.meta.TelegramBotsApi;

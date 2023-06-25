@@ -7,7 +7,7 @@ import kono.ene.napi.dao.repository.NintendoUserDao;
 import kono.ene.napi.request.AccountAccessTokenRequest;
 import kono.ene.napi.request.UserInfoRequest;
 import kono.ene.napi.response.ResponseDto;
-import kono.ene.napi.service.NintendoService;
+import kono.ene.napi.service.nintendo.NintendoService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

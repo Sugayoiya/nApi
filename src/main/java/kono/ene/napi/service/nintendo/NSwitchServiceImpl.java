@@ -1,4 +1,4 @@
-package kono.ene.napi.service;
+package kono.ene.napi.service.nintendo;
 
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONArray;

@@ -12,7 +12,7 @@ import kono.ene.napi.response.ns.AccountAccessTokenResponse;
 import kono.ene.napi.response.ns.LoginChallengeResponse;
 import kono.ene.napi.response.ns.SessionTokenResponse;
 import kono.ene.napi.response.ns.WebServiceAccessTokenResponse;
-import kono.ene.napi.service.NintendoService;
+import kono.ene.napi.service.nintendo.NintendoService;
 import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.*;
 

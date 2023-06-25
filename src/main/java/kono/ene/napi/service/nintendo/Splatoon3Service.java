@@ -1,4 +1,4 @@
-package kono.ene.napi.service;
+package kono.ene.napi.service.nintendo;
 
 import cn.hutool.json.JSONObject;
 import kono.ene.napi.response.splat3.BattleHistoryResponse;

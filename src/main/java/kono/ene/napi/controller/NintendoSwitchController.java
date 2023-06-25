@@ -3,7 +3,7 @@ package kono.ene.napi.controller;
 import jakarta.annotation.Resource;
 import kono.ene.napi.request.FriendRequest;
 import kono.ene.napi.response.ns.*;
-import kono.ene.napi.service.NSwitchService;
+import kono.ene.napi.service.nintendo.NSwitchService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

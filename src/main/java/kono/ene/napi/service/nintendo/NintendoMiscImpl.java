@@ -1,4 +1,4 @@
-package kono.ene.napi.service;
+package kono.ene.napi.service.nintendo;
 
 import jakarta.annotation.Resource;
 import kono.ene.napi.dao.entity.GlobalConfigDo;
