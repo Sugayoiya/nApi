@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @SpringBootTest
 @Slf4j
-class MiscTest {
+class NConfigTest {
     @Resource
     private NintendoUserDao nintendoUserDao;
     @Resource

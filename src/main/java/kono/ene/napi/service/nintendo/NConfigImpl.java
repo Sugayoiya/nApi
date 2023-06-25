@@ -2,6 +2,7 @@ package kono.ene.napi.service.nintendo;
 
 import jakarta.annotation.Resource;
 import kono.ene.napi.dao.entity.GlobalConfigDo;
+import kono.ene.napi.util.Misc;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -18,16 +19,16 @@ import java.util.concurrent.Executors;
 import static kono.ene.napi.constant.MongoField.*;
 
 @Service
-public class MiscImpl implements Misc {
+public class NConfigImpl implements NConfig {
     @Resource
     private MongoTemplate mongoTemplate;
 
     @Override
-    public void updateNintendoGlobalConfig() {
+    public void updateGlobalConfig() {
         try (var ex = Executors.newVirtualThreadPerTaskExecutor()) {
-            CompletableFuture<String> nsoAppVersionFuture = CompletableFuture.supplyAsync(kono.ene.napi.util.Misc::getNSOAppVersion, ex);
-            CompletableFuture<String> nsoMainJsFuture = CompletableFuture.supplyAsync(kono.ene.napi.util.Misc::getMainJsUrl, ex);
-            CompletableFuture<String> nsoWebVersionFuture = nsoMainJsFuture.thenApplyAsync(kono.ene.napi.util.Misc::getWebViewVersion);
+            CompletableFuture<String> nsoAppVersionFuture = CompletableFuture.supplyAsync(Misc::getNSOAppVersion, ex);
+            CompletableFuture<String> nsoMainJsFuture = CompletableFuture.supplyAsync(Misc::getMainJsUrl, ex);
+            CompletableFuture<String> nsoWebVersionFuture = nsoMainJsFuture.thenApplyAsync(Misc::getWebViewVersion);
 
             String nsoAppVersion = nsoAppVersionFuture.get();
             String nsoWebViewVersion = nsoWebVersionFuture.get();

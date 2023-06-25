@@ -3,7 +3,7 @@ package kono.ene.napi.config;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import kono.ene.napi.dao.entity.GlobalConfigDo;
-import kono.ene.napi.service.nintendo.Misc;
+import kono.ene.napi.service.nintendo.NConfig;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -17,17 +17,17 @@ import java.util.List;
 public class GlobalConfiguration {
 
     @Resource
-    private Misc misc;
+    private NConfig NConfig;
 
     @PostConstruct
     public void init() {
         log.info("init GlobalConfig post construct");
-        misc.updateNintendoGlobalConfig();
+        NConfig.updateGlobalConfig();
     }
 
     @Bean(name = "globalConfigDTO")
     public GlobalConfigDTO getNintendoGlobalConfig() {
-        GlobalConfigDo globalConfig = misc.getGlobalConfig();
+        GlobalConfigDo globalConfig = NConfig.getGlobalConfig();
         GlobalConfigDTO globalConfigDTO = new GlobalConfigDTO();
         globalConfigDTO.setAppVersion(globalConfig.getAppVersion());
         globalConfigDTO.setWebViewVersion(globalConfig.getWebViewVersion());
