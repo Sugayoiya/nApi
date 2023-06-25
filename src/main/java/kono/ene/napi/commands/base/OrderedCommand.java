@@ -3,7 +3,6 @@ package kono.ene.napi.commands.base;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 
 public abstract class OrderedCommand extends BotCommand implements IOrderedCommand {
-
     private final String group;
     private final int order;
 

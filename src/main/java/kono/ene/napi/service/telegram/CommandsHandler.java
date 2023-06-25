@@ -2,7 +2,12 @@ package kono.ene.napi.service.telegram;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
-import kono.ene.napi.commands.*;
+import kono.ene.napi.commands.HelpCommand;
+import kono.ene.napi.commands.nintendo.AccountCommand;
+import kono.ene.napi.commands.nintendo.BindCommand;
+import kono.ene.napi.commands.nintendo.LoginChallengeCommand;
+import kono.ene.napi.commands.nintendo.UserMeCommand;
+import kono.ene.napi.commands.splatoon.Splat3Command;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

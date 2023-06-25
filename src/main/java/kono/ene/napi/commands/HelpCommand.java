@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
  * A special bot command used for printing help messages similiar to the Linux man command.
  * The commands printed by this command should implement the {@link IManCommand} interface to provide an extended description.
  *
- * @author Lukas Prediger(Chase)
  * @version 1.0.0
  */
 public class HelpCommand extends ManCommand {
@@ -119,8 +118,7 @@ public class HelpCommand extends ManCommand {
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
-        if (absSender instanceof ICommandRegistry) {
-            ICommandRegistry registry = (ICommandRegistry) absSender;
+        if (absSender instanceof ICommandRegistry registry) {
 
             if (arguments.length > 0) {
                 IBotCommand command = registry.getRegisteredCommand(arguments[0]);

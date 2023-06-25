@@ -1,4 +1,4 @@
-package kono.ene.napi.commands;
+package kono.ene.napi.commands.nintendo;
 
 import jakarta.annotation.Resource;
 import kono.ene.napi.commands.base.OrderedCommand;
@@ -13,18 +13,17 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 @Component
-public class AccountCommand extends OrderedCommand {
-    private static final String COMMAND_IDENTIFIER = "account";
-    private static final String COMMAND_DESCRIPTION = "login nintendo switch account, then you can use /splat3 | /other command";
-    private static final String LOG_TAG = "ACCOUNT_COMMAND";
+public class BindCommand extends OrderedCommand {
+    private static final String COMMAND_IDENTIFIER = "bind";
+    private static final String COMMAND_DESCRIPTION = "copy the link address, and paste it behind /bind, after that you can use /account to login";
+    private static final String LOG_TAG = "LOGIN_COMMAND";
 
     private static final String GROUP = "nintendo";
-    private static final int ORDER = 3;
-
+    private static final int ORDER = 1;
     @Resource
     private NintendoService nintendoService;
 
-    public AccountCommand() {
+    public BindCommand() {
         super(COMMAND_IDENTIFIER, COMMAND_DESCRIPTION, GROUP, ORDER);
     }
 
@@ -33,9 +32,17 @@ public class AccountCommand extends OrderedCommand {
         Long id = user.getId();
         SendMessage answer = new SendMessage();
         StringBuilder messageTextBuilder = new StringBuilder();
-        nintendoService.nintendo_switch_account(id);
-        answer.setChatId(chat.getId().toString());
-        answer.setText(messageTextBuilder.append("login ns account success").toString());
+        // if no arguments, return help
+        if (arguments.length == 0) {
+            messageTextBuilder.append("Usage: /session <session_token>");
+            answer.setChatId(chat.getId().toString());
+            answer.setText(messageTextBuilder.toString());
+        } else {
+            String redirectUrl = arguments[0];
+            nintendoService.bind(id, redirectUrl);
+            answer.setChatId(chat.getId().toString());
+            answer.setText(messageTextBuilder.append("bind success").toString());
+        }
 
         try {
             absSender.execute(answer);
@@ -43,5 +50,6 @@ public class AccountCommand extends OrderedCommand {
             log.error(LOG_TAG, e);
             throw new RuntimeException(e);
         }
+
     }
 }

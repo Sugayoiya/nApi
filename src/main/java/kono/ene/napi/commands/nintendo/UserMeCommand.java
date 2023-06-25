@@ -1,4 +1,4 @@
-package kono.ene.napi.commands;
+package kono.ene.napi.commands.nintendo;
 
 import jakarta.annotation.Resource;
 import kono.ene.napi.commands.base.OrderedCommand;
