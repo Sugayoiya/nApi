@@ -2,6 +2,7 @@ package kono.ene.napi.commands.nintendo;
 
 import jakarta.annotation.Resource;
 import kono.ene.napi.commands.base.OrderedCommand;
+import kono.ene.napi.exception.BaseRuntimeException;
 import kono.ene.napi.service.nintendo.NintendoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -40,7 +41,7 @@ public class UserMeCommand extends OrderedCommand {
             absSender.execute(answer);
         } catch (TelegramApiException e) {
             log.error(LOG_TAG, e);
-            throw new RuntimeException(e);
+            throw new BaseRuntimeException(50001, "telegram execute error", e);
         }
     }
 }

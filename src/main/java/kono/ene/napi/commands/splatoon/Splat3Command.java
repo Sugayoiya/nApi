@@ -2,6 +2,7 @@ package kono.ene.napi.commands.splatoon;
 
 import jakarta.annotation.Resource;
 import kono.ene.napi.commands.base.OrderedCommand;
+import kono.ene.napi.response.ns.WebServiceAccessTokenResponse;
 import kono.ene.napi.service.nintendo.NintendoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,7 @@ public class Splat3Command extends OrderedCommand {
         Long id = user.getId();
         SendMessage answer = new SendMessage();
         StringBuilder messageTextBuilder = new StringBuilder();
-        nintendoService.web_service_token(id, "Splatoon 3（斯普拉遁 3）");
+        WebServiceAccessTokenResponse response = nintendoService.web_service_token(id, "Splatoon 3（斯普拉遁 3）");
         answer.setChatId(chat.getId().toString());
         answer.setText(messageTextBuilder.append("splatoon3 webservice token refresh success").toString());
 

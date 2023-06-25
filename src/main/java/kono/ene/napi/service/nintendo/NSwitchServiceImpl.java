@@ -6,7 +6,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Resource;
-import kono.ene.napi.config.GlobalConfigurage;
+import kono.ene.napi.config.GlobalConfiguration;
 import kono.ene.napi.dao.entity.GlobalConfigDo;
 import kono.ene.napi.dao.entity.SwitchUserDo;
 import kono.ene.napi.dao.repository.NintendoGlobalConfigDao;
@@ -36,7 +36,7 @@ public class NSwitchServiceImpl implements NSwitchService {
     private MongoTemplate mongoTemplate;
     @Resource
     @Qualifier("globalConfigDTO")
-    private GlobalConfigurage.GlobalConfigDTO globalConfig;
+    private GlobalConfiguration.GlobalConfigDTO globalConfig;
 
     private HttpResponse do_znc_call(Long qid, String path, Map<String, Object> params) {
         SwitchUserDo switchUserDo = nintendoSwitchUserDao.findByQid(qid);

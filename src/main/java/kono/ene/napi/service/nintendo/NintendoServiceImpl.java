@@ -5,7 +5,7 @@ import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import jakarta.annotation.Resource;
-import kono.ene.napi.config.GlobalConfigurage;
+import kono.ene.napi.config.GlobalConfiguration;
 import kono.ene.napi.constant.MongoField;
 import kono.ene.napi.dao.entity.*;
 import kono.ene.napi.dao.repository.*;
@@ -60,7 +60,7 @@ public class NintendoServiceImpl implements NintendoService {
     private NintendoSwitchWebAccessTokenDao nintendoSwitchWebAccessTokenDao;
     @Resource
     @Qualifier("globalConfigDTO")
-    private GlobalConfigurage.GlobalConfigDTO globalConfig;
+    private GlobalConfiguration.GlobalConfigDTO globalConfig;
 
     @Resource
     private MongoTemplate mongoTemplate;
@@ -392,7 +392,7 @@ public class NintendoServiceImpl implements NintendoService {
     @Override
     public WebServiceAccessTokenResponse web_service_token(WebServiceRequest webServiceRequest) {
         Long qid = webServiceRequest.getQid();
-        GlobalConfigurage.GlobalConfigDTO.ServiceConfig webService = globalConfig.getWebServices().stream()
+        GlobalConfiguration.GlobalConfigDTO.ServiceConfig webService = globalConfig.getWebServices().stream()
                 .filter(ws -> ws.getName().equals(webServiceRequest.getGameStr()))
                 .findFirst().orElseThrow(() -> new RuntimeException("web_service_token gameStr error"));
 

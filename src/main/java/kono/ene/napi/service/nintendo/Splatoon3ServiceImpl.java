@@ -6,7 +6,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import jakarta.annotation.Resource;
-import kono.ene.napi.config.GlobalConfigurage;
+import kono.ene.napi.config.GlobalConfiguration;
 import kono.ene.napi.dao.entity.WebAccessTokenDo;
 import kono.ene.napi.dao.repository.NintendoGlobalConfigDao;
 import kono.ene.napi.dao.repository.NintendoSwitchUserDao;
@@ -40,12 +40,12 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
     private NintendoUserDao nintendoUserDao;
     @Resource
     @Qualifier("globalConfigDTO")
-    private GlobalConfigurage.GlobalConfigDTO globalConfig;
+    private GlobalConfiguration.GlobalConfigDTO globalConfig;
     private static final long SPLATOON3_ID = 4834290508791808L;
 
-    private GlobalConfigurage.GlobalConfigDTO.ServiceConfig getSplatoon3ServiceConfig() {
-        List<GlobalConfigurage.GlobalConfigDTO.ServiceConfig> webServices = globalConfig.getWebServices();
-        for (GlobalConfigurage.GlobalConfigDTO.ServiceConfig webService : webServices) {
+    private GlobalConfiguration.GlobalConfigDTO.ServiceConfig getSplatoon3ServiceConfig() {
+        List<GlobalConfiguration.GlobalConfigDTO.ServiceConfig> webServices = globalConfig.getWebServices();
+        for (GlobalConfiguration.GlobalConfigDTO.ServiceConfig webService : webServices) {
             if (webService.getId() == SPLATOON3_ID) {
                 return webService;
             }

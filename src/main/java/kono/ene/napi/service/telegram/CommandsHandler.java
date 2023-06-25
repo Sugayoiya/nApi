@@ -21,7 +21,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 /**
  * This handler mainly works with commands to demonstrate the Commands feature of the API
  *
- * @author Timo Schulz (Mit0x2)
  */
 @Slf4j
 @Component
@@ -29,6 +28,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
     public static final String LOG_TAG = "COMMANDS_HANDLER";
     private final String botToken;
     private final String botName;
+
     @Resource
     private LoginChallengeCommand loginChallengeCommand;
     @Resource
