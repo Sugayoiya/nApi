@@ -1,6 +1,7 @@
-package kono.ene.napi.controller;
+package kono.ene.napi.controller.nintendo;
 
 import jakarta.annotation.Resource;
+import kono.ene.napi.controller.AbstractBaseController;
 import kono.ene.napi.request.FriendRequest;
 import kono.ene.napi.response.ns.*;
 import kono.ene.napi.service.nintendo.NSwitchService;

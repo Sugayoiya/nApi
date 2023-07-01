@@ -1,6 +1,7 @@
-package kono.ene.napi.controller;
+package kono.ene.napi.controller.nintendo;
 
 import jakarta.annotation.Resource;
+import kono.ene.napi.controller.AbstractBaseController;
 import kono.ene.napi.dao.entity.SwitchUserDo;
 import kono.ene.napi.dao.entity.UserDo;
 import kono.ene.napi.request.AccountAccessTokenRequest;
