@@ -1,4 +1,4 @@
-package kono.ene.napi.mongo;
+package kono.ene.napi.config;
 
 import kono.ene.napi.dao.base.BaseRepoImpl;
 import org.springframework.context.annotation.Configuration;
