@@ -1,4 +1,4 @@
-package kono.ene.napi.commands.base;
+package kono.ene.napi.service.telegram.commands.base;
 
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 

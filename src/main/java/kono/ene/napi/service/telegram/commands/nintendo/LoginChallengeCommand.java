@@ -1,9 +1,9 @@
-package kono.ene.napi.commands.nintendo;
+package kono.ene.napi.service.telegram.commands.nintendo;
 
 import jakarta.annotation.Resource;
-import kono.ene.napi.commands.base.OrderedCommand;
 import kono.ene.napi.exception.BaseRuntimeException;
 import kono.ene.napi.service.nintendo.NintendoService;
+import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

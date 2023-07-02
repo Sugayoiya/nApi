@@ -1,4 +1,4 @@
-package kono.ene.napi.commands.base;
+package kono.ene.napi.service.telegram.commands.base;
 
 public interface IOrderedCommand {
 

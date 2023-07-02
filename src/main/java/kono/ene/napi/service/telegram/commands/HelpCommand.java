@@ -1,6 +1,6 @@
-package kono.ene.napi.commands;
+package kono.ene.napi.service.telegram.commands;
 
-import kono.ene.napi.commands.base.OrderedCommand;
+import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.IBotCommand;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.ICommandRegistry;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.helpCommand.IManCommand;

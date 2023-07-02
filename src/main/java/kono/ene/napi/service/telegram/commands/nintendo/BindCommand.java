@@ -1,9 +1,9 @@
-package kono.ene.napi.commands.nintendo;
+package kono.ene.napi.service.telegram.commands.nintendo;
 
 import jakarta.annotation.Resource;
-import kono.ene.napi.commands.base.OrderedCommand;
 import kono.ene.napi.exception.BaseRuntimeException;
 import kono.ene.napi.service.nintendo.NintendoService;
+import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -14,18 +14,17 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 @Component
-public class UserMeCommand extends OrderedCommand {
-    private static final String COMMAND_IDENTIFIER = "userme";
-    private static final String COMMAND_DESCRIPTION = "update user info";
-    private static final String LOG_TAG = "USER_ME_COMMAND";
+public class BindCommand extends OrderedCommand {
+    private static final String COMMAND_IDENTIFIER = "bind";
+    private static final String COMMAND_DESCRIPTION = "copy the link address, and paste it behind /bind, after that you can use /account to login";
+    private static final String LOG_TAG = "LOGIN_COMMAND";
 
     private static final String GROUP = "nintendo";
-    private static final int ORDER = 2;
-
+    private static final int ORDER = 1;
     @Resource
     private NintendoService nintendoService;
 
-    public UserMeCommand() {
+    public BindCommand() {
         super(COMMAND_IDENTIFIER, COMMAND_DESCRIPTION, GROUP, ORDER);
     }
 
@@ -34,14 +33,24 @@ public class UserMeCommand extends OrderedCommand {
         Long id = user.getId();
         SendMessage answer = new SendMessage();
         StringBuilder messageTextBuilder = new StringBuilder();
-        nintendoService.userInfo(id);
-        answer.setChatId(chat.getId().toString());
-        answer.setText(messageTextBuilder.append("update success").toString());
+        // if no arguments, return help
+        if (arguments.length == 0) {
+            messageTextBuilder.append("Usage: /session <session_token>");
+            answer.setChatId(chat.getId().toString());
+            answer.setText(messageTextBuilder.toString());
+        } else {
+            String redirectUrl = arguments[0];
+            nintendoService.bind(id, redirectUrl);
+            answer.setChatId(chat.getId().toString());
+            answer.setText(messageTextBuilder.append("bind success").toString());
+        }
+
         try {
             absSender.execute(answer);
         } catch (TelegramApiException e) {
             log.error(LOG_TAG, e);
             throw new BaseRuntimeException(50001, "telegram execute error", e);
         }
+
     }
 }
