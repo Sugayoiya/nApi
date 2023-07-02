@@ -1,13 +1,9 @@
 package kono.ene.napi.response;
 
 
-import brave.Tracer;
-import kono.ene.napi.exception.BaseRuntimeException;
-import kono.ene.napi.util.SpringContextUtil;
+import kono.ene.napi.exception.BusinessException;
+import kono.ene.napi.exception.ErrorEnum;
 import lombok.Data;
-
-
-import java.util.UUID;
 
 @Data
 public class ResponseDto<T> {
@@ -36,9 +32,13 @@ public class ResponseDto<T> {
         return new ResponseDto<>(code, msg, null);
     }
 
+    public static <T> ResponseDto<T> failed(ErrorEnum errorEnum) {
+        return new ResponseDto<>(errorEnum.getErrorCode(), errorEnum.getErrorMsg(), null);
+    }
+
     public T parseDataSafely() {
         if (code != 0) {
-            throw new BaseRuntimeException(code, msg);
+            throw new BusinessException(code, msg);
         }
         return data;
     }

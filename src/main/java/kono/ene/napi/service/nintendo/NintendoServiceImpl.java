@@ -9,7 +9,7 @@ import kono.ene.napi.config.GlobalConfiguration;
 import kono.ene.napi.constant.MongoField;
 import kono.ene.napi.dao.entity.*;
 import kono.ene.napi.dao.repository.*;
-import kono.ene.napi.exception.BaseRuntimeException;
+import kono.ene.napi.exception.BusinessException;
 import kono.ene.napi.request.AccountAccessTokenRequest;
 import kono.ene.napi.request.SessionRequest;
 import kono.ene.napi.request.UserInfoRequest;
@@ -142,7 +142,7 @@ public class NintendoServiceImpl implements NintendoService {
     public String sessionToken(SessionRequest sessionRequest) {
         CodeChallengeDo nintendoCodeChallenge = nintendoCodeChallengeDao.findByQid(sessionRequest.getQid());
         if (nintendoCodeChallenge == null) {
-            throw new BaseRuntimeException(40001, "please login first");
+            throw new BusinessException(40001, "please login first");
         } else if (!StringUtils.hasLength(nintendoCodeChallenge.getSessionToken())) {
             String code = decodeUrl(sessionRequest.getRedirect_url());
 
@@ -191,7 +191,7 @@ public class NintendoServiceImpl implements NintendoService {
 
         CodeChallengeDo codeChallengeDo = nintendoCodeChallengeDao.findByQid(accessTokenRequest.getQid());
         if (codeChallengeDo == null || !StringUtils.hasLength(codeChallengeDo.getSessionToken())) {
-            throw new BaseRuntimeException(40000, "session token not found");
+            throw new BusinessException(40000, "session token not found");
         }
 
         Map<String, String> headers = new HashMap<>();
@@ -377,7 +377,7 @@ public class NintendoServiceImpl implements NintendoService {
 
             return switchUserDoFuture.get();
         } catch (ExecutionException | InterruptedException e) {
-            throw new BaseRuntimeException(40002, "nintendo_switch_account error", e);
+            throw new BusinessException(40002, "nintendo_switch_account error", e);
         }
 
     }
@@ -479,7 +479,7 @@ public class NintendoServiceImpl implements NintendoService {
             }, ex);
             return webServiceTokenFuture.get();
         } catch (ExecutionException | InterruptedException e) {
-            throw new BaseRuntimeException(40003, "web_service_token error", e);
+            throw new BusinessException(40003, "web_service_token error", e);
         }
     }
 }

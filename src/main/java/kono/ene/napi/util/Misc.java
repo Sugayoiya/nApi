@@ -4,7 +4,7 @@ import cn.hutool.http.ContentType;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
-import kono.ene.napi.exception.BaseRuntimeException;
+import kono.ene.napi.exception.BusinessException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection.Response;
@@ -34,7 +34,7 @@ public class Misc {
             if (httpResponse.isOk())
                 return httpResponse.body();
             else
-                throw new BaseRuntimeException(40001, "doGet error: " + httpResponse.getStatus() + " " + httpResponse.body());
+                throw new BusinessException(40001, "doGet error: " + httpResponse.getStatus() + " " + httpResponse.body());
         }
     }
 
@@ -48,7 +48,7 @@ public class Misc {
             if (httpResponse.isOk())
                 return httpResponse.body();
             else
-                throw new BaseRuntimeException(40001, "doPost error: " + httpResponse.getStatus() + " " + httpResponse.body());
+                throw new BusinessException(40001, "doPost error: " + httpResponse.getStatus() + " " + httpResponse.body());
         }
     }
 
@@ -61,7 +61,7 @@ public class Misc {
             if (httpResponse.isOk())
                 return httpResponse.body();
             else
-                throw new BaseRuntimeException(40001, "doPost error: " + httpResponse.getStatus() + " " + httpResponse.body());
+                throw new BusinessException(40001, "doPost error: " + httpResponse.getStatus() + " " + httpResponse.body());
         }
     }
 
@@ -70,7 +70,7 @@ public class Misc {
             if (httpResponse.isOk())
                 return httpResponse.body();
             else
-                throw new BaseRuntimeException(40001, "doPost error: " + httpResponse.getStatus() + " " + httpResponse.body());
+                throw new BusinessException(40001, "doPost error: " + httpResponse.getStatus() + " " + httpResponse.body());
         }
     }
 

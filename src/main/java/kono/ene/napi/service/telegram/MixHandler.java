@@ -84,10 +84,10 @@ public class MixHandler extends TelegramLongPollingBot implements CommandBot, IC
     }
 
     /**
-     * Converts resutls from RaeService to an answer to an inline query
+     * Converts results to an answer to an inline query
      *
      * @param inlineQuery Original inline query
-     * @param results     Results from RAE service
+     * @param results     Results
      * @return AnswerInlineQuery method to answer the query
      */
     private static AnswerInlineQuery convertResultsToResponse(InlineQuery inlineQuery, List<?> results) {
@@ -187,6 +187,7 @@ public class MixHandler extends TelegramLongPollingBot implements CommandBot, IC
 
     @Override
     public void onUpdateReceived(Update update) {
+        log.info("Received Update with ID: {}, Message: {} ", update.getUpdateId(), update.getMessage());
         if (update.hasInlineQuery()) {
             handleIncomingInlineQuery(update.getInlineQuery());
         } else if (update.hasMessage()) {
@@ -277,13 +278,13 @@ public class MixHandler extends TelegramLongPollingBot implements CommandBot, IC
 
     /**
      * @param text          The text that should be shown
-     * @param alert         If the text should be shown as a alert or not
-     * @param callbackquery
-     * @throws TelegramApiException
+     * @param alert         If the text should be shown as an alert or not
+     * @param callBackQuery The callBackQuery that should be answered
+     * @throws TelegramApiException If something goes wrong
      */
-    private void sendAnswerCallbackQuery(String text, boolean alert, CallbackQuery callbackquery) throws TelegramApiException {
+    private void sendAnswerCallbackQuery(String text, boolean alert, CallbackQuery callBackQuery) throws TelegramApiException {
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-        answerCallbackQuery.setCallbackQueryId(callbackquery.getId());
+        answerCallbackQuery.setCallbackQueryId(callBackQuery.getId());
         answerCallbackQuery.setShowAlert(alert);
         answerCallbackQuery.setText(text);
         execute(answerCallbackQuery);
@@ -292,7 +293,7 @@ public class MixHandler extends TelegramLongPollingBot implements CommandBot, IC
     /**
      * @param index  Index of the current image
      * @param action What button was clicked
-     * @return
+     * @return The new markup
      */
     private InlineKeyboardMarkup getGalleryView(int index, int action) {
         /*

@@ -18,6 +18,7 @@
     <properties>
         <java.version>20</java.version>
         <weixin-java-mp.version>4.4.0</weixin-java-mp.version>
+        <redisson-spring-boot-starter.version>3.17.1</redisson-spring-boot-starter.version>
         <!--        <spring-cloud.version>2022.0.3</spring-cloud.version>-->
         <!--        <spring-boot.version>3.0.3</spring-boot.version>-->
     </properties>
@@ -99,6 +100,11 @@
             <version>${weixin-java-mp.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>${redisson-spring-boot-starter.version}</version>
+        </dependency>
 
         <!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.github.unafraid.telegram-apis/CoreAPI &ndash;&gt;-->
         <!--        <dependency>-->

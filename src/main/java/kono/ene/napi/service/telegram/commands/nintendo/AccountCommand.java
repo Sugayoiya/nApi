@@ -1,7 +1,7 @@
 package kono.ene.napi.service.telegram.commands.nintendo;
 
 import jakarta.annotation.Resource;
-import kono.ene.napi.exception.BaseRuntimeException;
+import kono.ene.napi.exception.BusinessException;
 import kono.ene.napi.service.nintendo.NintendoService;
 import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class AccountCommand extends OrderedCommand {
             absSender.execute(answer);
         } catch (TelegramApiException e) {
             log.error(LOG_TAG, e);
-            throw new BaseRuntimeException(50001, "telegram execute error", e);
+            throw new BusinessException(50001, "telegram execute error", e);
         }
     }
 }
