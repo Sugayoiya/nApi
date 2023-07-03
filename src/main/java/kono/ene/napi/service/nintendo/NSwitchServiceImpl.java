@@ -11,6 +11,7 @@ import kono.ene.napi.dao.entity.GlobalConfigDo;
 import kono.ene.napi.dao.entity.SwitchUserDo;
 import kono.ene.napi.dao.repository.NintendoGlobalConfigDao;
 import kono.ene.napi.dao.repository.NintendoSwitchUserDao;
+import kono.ene.napi.exception.BusinessException;
 import kono.ene.napi.response.ns.*;
 import kono.ene.napi.util.Misc;
 import lombok.extern.slf4j.Slf4j;
@@ -180,7 +181,7 @@ public class NSwitchServiceImpl implements NSwitchService {
         if (matcher.find()) {
             return String.format("%s-%s-%s", matcher.group(1), matcher.group(2), matcher.group(3));
         }
-        throw new RuntimeException("malformed friend code");
+        throw new BusinessException("malformed friend code");
     }
 
     @Override

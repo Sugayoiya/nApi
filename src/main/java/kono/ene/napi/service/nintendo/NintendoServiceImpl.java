@@ -119,7 +119,7 @@ public class NintendoServiceImpl implements NintendoService {
             CompletableFuture<Void> userInfo = refreshAccessToken.thenAcceptAsync(accessToken -> userInfo(qid), ex);
             userInfo.get();
         } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new BusinessException(40001, "bind failed", e);
         }
     }
 
@@ -130,7 +130,7 @@ public class NintendoServiceImpl implements NintendoService {
         if (matcher.find()) {
             return matcher.group(1);
         }
-        throw new RuntimeException("url malformed");
+        throw new BusinessException("url malformed");
     }
 
     @Override
@@ -334,10 +334,10 @@ public class NintendoServiceImpl implements NintendoService {
                 Integer status = responseJson.getInt("status");
                 if (status == 9404) {
                     log.warn("nintendo accessToken expired, response: {}", b);
-                    throw new RuntimeException("nintendo_switch_account token expired");
+                    throw new BusinessException("nintendo_switch_account token expired");
                 } else if (status != 0) {
                     log.error("nintendo_switch_account error, response: {}", b);
-                    throw new RuntimeException("nintendo_switch_account error");
+                    throw new BusinessException("nintendo_switch_account error");
                 }
 
                 JSONObject result = responseJson.getJSONObject("result");
@@ -394,7 +394,7 @@ public class NintendoServiceImpl implements NintendoService {
         Long qid = webServiceRequest.getQid();
         GlobalConfiguration.GlobalConfigDTO.ServiceConfig webService = globalConfig.getWebServices().stream()
                 .filter(ws -> ws.getName().equals(webServiceRequest.getGameStr()))
-                .findFirst().orElseThrow(() -> new RuntimeException("web_service_token gameStr error"));
+                .findFirst().orElseThrow(() -> new BusinessException("web_service_token gameStr error"));
 
         var webAccessToken = nintendoSwitchWebAccessTokenDao.findByQidAndGameId(qid, webService.getId());
         if (webAccessToken != null) {
@@ -447,7 +447,7 @@ public class NintendoServiceImpl implements NintendoService {
             CompletableFuture<WebServiceAccessTokenResponse> webServiceTokenFuture = bodyFuture.thenCombineAsync(userDoFuture, (b, u) -> {
                 JSONObject result = JSONUtil.parseObj(b);
                 if (result.getInt("status") != 0) {
-                    throw new RuntimeException("web_service_token error");
+                    throw new BusinessException("web_service_token error");
                 }
                 JSONObject webServiceTokenJson = result.getJSONObject("result");
                 Date now = new Date();

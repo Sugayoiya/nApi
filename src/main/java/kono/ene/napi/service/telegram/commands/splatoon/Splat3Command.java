@@ -1,6 +1,7 @@
 package kono.ene.napi.service.telegram.commands.splatoon;
 
 import jakarta.annotation.Resource;
+import kono.ene.napi.exception.BusinessException;
 import kono.ene.napi.response.ns.WebServiceAccessTokenResponse;
 import kono.ene.napi.service.nintendo.NintendoService;
 import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
@@ -41,7 +42,7 @@ public class Splat3Command extends OrderedCommand {
             absSender.execute(answer);
         } catch (TelegramApiException e) {
             log.error(LOG_TAG, e);
-            throw new RuntimeException(e);
+            throw new BusinessException("telegram splatoon3 command error:" + e.getMessage());
         }
 
     }

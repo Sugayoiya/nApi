@@ -123,7 +123,7 @@ public class Misc {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BusinessException(40001, "getMainJsUrl error", e);
         }
         return null;
     }
@@ -152,7 +152,7 @@ public class Misc {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BusinessException(40001, "getWebViewVersion error", e);
         }
 
         log.warn("getWebViewVersion error, return fallback version: {}", WEB_VIEW_VERSION);

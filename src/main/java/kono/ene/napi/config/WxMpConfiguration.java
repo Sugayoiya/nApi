@@ -1,5 +1,6 @@
 package kono.ene.napi.config;
 
+import kono.ene.napi.exception.BusinessException;
 import kono.ene.napi.service.wechat.handler.*;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
@@ -39,7 +40,7 @@ public class WxMpConfiguration {
     public WxMpService wxMpService() {
         final List<WxMpProperties.MpConfig> configs = this.properties.getConfigs();
         if (configs == null) {
-            throw new RuntimeException("配置错误！");
+            throw new BusinessException("wrong configuration of wechat mp");
         }
 
         WxMpService service = new WxMpServiceImpl();

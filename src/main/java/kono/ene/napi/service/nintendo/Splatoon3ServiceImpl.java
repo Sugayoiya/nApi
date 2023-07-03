@@ -12,6 +12,7 @@ import kono.ene.napi.dao.repository.NintendoGlobalConfigDao;
 import kono.ene.napi.dao.repository.NintendoSwitchUserDao;
 import kono.ene.napi.dao.repository.NintendoSwitchWebAccessTokenDao;
 import kono.ene.napi.dao.repository.NintendoUserDao;
+import kono.ene.napi.exception.BusinessException;
 import kono.ene.napi.response.splat3.BattleHistoryResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
@@ -50,7 +51,7 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
                 return webService;
             }
         }
-        throw new RuntimeException("splatoon3 service config not found");
+        throw new BusinessException("splatoon3 service config not found");
     }
 
     @Override
@@ -90,7 +91,7 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
                         FindAndModifyOptions.options().returnNew(true).upsert(true));
                 return switchWebAccessTokenDo.getBulletToken();
             } else {
-                throw new RuntimeException("bulletToken error: " + httpResponse.getStatus() + " " + httpResponse.body());
+                throw new BusinessException("bulletToken error: " + httpResponse.getStatus() + " " + httpResponse.body());
             }
         }
     }
@@ -268,7 +269,7 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
                 String body = httpResponse.body();
                 return JSONUtil.parseObj(body, true).getJSONObject("data");
             }
-            throw new RuntimeException("createGraphqlRequest error: " + httpResponse.getStatus() + " " + httpResponse.body());
+            throw new BusinessException("createGraphqlRequest error: " + httpResponse.getStatus() + " " + httpResponse.body());
         }
     }
 }
