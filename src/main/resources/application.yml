@@ -59,3 +59,15 @@ wx:
 
 server:
   port: ${nintendo.server.port}
+
+chat:
+  chatgpt:
+    enable: ${nintendo.chatgpt.enable}
+    AIUserId: ${nintendo.chatgpt.uid}
+    key: ${nintendo.chatgpt.key}
+    proxyUrl: ${nintendo.chatgpt.proxyUrl}
+  chatglm:
+    enable: ${nintendo.chatglm.enable}
+    url: ${nintendo.chatglm.url}
+    minute: 3 # 每个用户每3分钟可以请求一次
+    AIUserId: ${nintendo.chatglm.uid}
