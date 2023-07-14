@@ -1,6 +1,7 @@
 package kono.ene.napi.service.telegram.commands;
 
 import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.IBotCommand;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.ICommandRegistry;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.helpCommand.IManCommand;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
  *
  * @version 1.0.0
  */
+@Component
 public class HelpCommand extends ManCommand {
 
     private static final String COMMAND_IDENTIFIER = "help";
@@ -70,7 +72,10 @@ public class HelpCommand extends ManCommand {
                     }
                     commands.stream()
                             .sorted(Comparator.comparingInt(OrderedCommand::getOrder))
-                            .forEach(command -> reply.append(command).append(System.lineSeparator()).append(System.lineSeparator()));
+                            .forEach(command -> reply
+                                    .append(command)
+                                    .append(System.lineSeparator())
+                                    .append(System.lineSeparator()));
                     reply.append(System.lineSeparator());
                 });
         return reply.toString();
@@ -138,6 +143,5 @@ public class HelpCommand extends ManCommand {
             }
         }
     }
-
 }
 

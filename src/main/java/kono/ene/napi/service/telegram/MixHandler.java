@@ -3,11 +3,7 @@ package kono.ene.napi.service.telegram;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import kono.ene.napi.service.telegram.commands.HelpCommand;
-import kono.ene.napi.service.telegram.commands.nintendo.AccountCommand;
-import kono.ene.napi.service.telegram.commands.nintendo.BindCommand;
-import kono.ene.napi.service.telegram.commands.nintendo.LoginChallengeCommand;
-import kono.ene.napi.service.telegram.commands.nintendo.UserMeCommand;
-import kono.ene.napi.service.telegram.commands.splatoon.Splat3Command;
+import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -52,15 +48,9 @@ public class MixHandler extends TelegramLongPollingBot implements CommandBot, IC
     private final String botToken;
     private final String botName;
     @Resource
-    private LoginChallengeCommand loginChallengeCommand;
+    private List<OrderedCommand> orderedCommands;
     @Resource
-    private BindCommand bindCommand;
-    @Resource
-    private UserMeCommand userMeCommand;
-    @Resource
-    private AccountCommand accountCommand;
-    @Resource
-    private Splat3Command splat3Command;
+    private HelpCommand helpCommand;
 
     final private String BACK = "⬅️  Back";
     final private String NEXT = "Next ➡️";
@@ -100,21 +90,15 @@ public class MixHandler extends TelegramLongPollingBot implements CommandBot, IC
 
     @PostConstruct
     private void postRegister() {
-        HelpCommand helpCommand = new HelpCommand();
         register(helpCommand);
-
-        register(loginChallengeCommand);
-        register(bindCommand);
-        register(userMeCommand);
-        register(accountCommand);
-        register(splat3Command);
+        orderedCommands.forEach(this::register);
 
         registerDefaultAction((absSender, message) -> {
-            SendMessage commandUnknownMessage = new SendMessage();
-            commandUnknownMessage.setChatId(message.getChatId());
-            commandUnknownMessage.setText("The command '" + message.getText() + "' is not known by this bot. Here comes some help ");
+            SendMessage commandUnknownMsg = new SendMessage();
+            commandUnknownMsg.setChatId(message.getChatId());
+            commandUnknownMsg.setText("The command '" + message.getText() + "' is not known by this bot. Here comes some help ");
             try {
-                absSender.execute(commandUnknownMessage);
+                absSender.execute(commandUnknownMsg);
             } catch (TelegramApiException e) {
                 log.error(LOG_TAG, e);
             }
