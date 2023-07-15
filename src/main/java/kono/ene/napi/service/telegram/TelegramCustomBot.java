@@ -2,8 +2,8 @@ package kono.ene.napi.service.telegram;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
-import kono.ene.napi.service.telegram.commands.HelpCommand;
-import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
+import kono.ene.napi.service.telegram.command.HelpCommand;
+import kono.ene.napi.service.telegram.command.base.OrderedCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -41,7 +41,7 @@ import java.util.function.BiConsumer;
  */
 @Slf4j
 @Component
-public class MixHandler extends TelegramLongPollingBot implements CommandBot, ICommandRegistry {
+public class TelegramCustomBot extends TelegramLongPollingBot implements CommandBot, ICommandRegistry {
     public static final String LOG_TAG = "MIXER_HANDLER";
     private static final Integer CACHE_TIME = 86400;
     private final CommandRegistry commandRegistry;
@@ -57,14 +57,19 @@ public class MixHandler extends TelegramLongPollingBot implements CommandBot, IC
     final private String INDEX_OUT_OF_RANGE = "Requested index is out of range!";
     private final ArrayList<String[]> urls;
 
+    private static final DefaultBotOptions defaultBotOptions = new DefaultBotOptions();
+
+    static {
+        defaultBotOptions.setMaxThreads(10);
+    }
 
     /**
      * Creates a TelegramLongPollingCommandBot
      * Use ICommandRegistry's methods on this bot to register commands
      */
-    public MixHandler(@Value("${telegram.token}") String botToken,
-                      @Value("${telegram.name}") String botName) {
-        super(new DefaultBotOptions(), botToken);
+    public TelegramCustomBot(@Value("${telegram.token}") String botToken,
+                             @Value("${telegram.name}") String botName) {
+        super(defaultBotOptions, botToken);
         this.botToken = botToken;
         this.botName = botName;
         this.commandRegistry = new CommandRegistry(true, this::getBotUsername);

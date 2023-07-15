@@ -1,10 +1,10 @@
-package kono.ene.napi.service.telegram.commands.splatoon;
+package kono.ene.napi.service.telegram.command.splatoon;
 
 import jakarta.annotation.Resource;
 import kono.ene.napi.exception.BusinessException;
 import kono.ene.napi.response.ns.WebServiceAccessTokenResponse;
 import kono.ene.napi.service.nintendo.NintendoService;
-import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
+import kono.ene.napi.service.telegram.command.base.OrderedCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

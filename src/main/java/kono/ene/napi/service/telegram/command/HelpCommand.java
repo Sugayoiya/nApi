@@ -1,6 +1,6 @@
-package kono.ene.napi.service.telegram.commands;
+package kono.ene.napi.service.telegram.command;
 
-import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
+import kono.ene.napi.service.telegram.command.base.OrderedCommand;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.IBotCommand;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.ICommandRegistry;

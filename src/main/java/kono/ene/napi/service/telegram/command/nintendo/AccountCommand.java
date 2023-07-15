@@ -1,9 +1,9 @@
-package kono.ene.napi.service.telegram.commands.nintendo;
+package kono.ene.napi.service.telegram.command.nintendo;
 
 import jakarta.annotation.Resource;
 import kono.ene.napi.exception.BusinessException;
 import kono.ene.napi.service.nintendo.NintendoService;
-import kono.ene.napi.service.telegram.commands.base.OrderedCommand;
+import kono.ene.napi.service.telegram.command.base.OrderedCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -14,17 +14,18 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 @Component
-public class BindCommand extends OrderedCommand {
-    private static final String COMMAND_IDENTIFIER = "bind";
-    private static final String COMMAND_DESCRIPTION = "copy the link address, and paste it behind /bind, after that you can use /account to login";
-    private static final String LOG_TAG = "LOGIN_COMMAND";
+public class AccountCommand extends OrderedCommand {
+    private static final String COMMAND_IDENTIFIER = "account";
+    private static final String COMMAND_DESCRIPTION = "login nintendo switch account, then you can use /splat3 | /other command";
+    private static final String LOG_TAG = "ACCOUNT_COMMAND";
 
     private static final String GROUP = "nintendo";
-    private static final int ORDER = 1;
+    private static final int ORDER = 3;
+
     @Resource
     private NintendoService nintendoService;
 
-    public BindCommand() {
+    public AccountCommand() {
         super(COMMAND_IDENTIFIER, COMMAND_DESCRIPTION, GROUP, ORDER);
     }
 
@@ -33,17 +34,9 @@ public class BindCommand extends OrderedCommand {
         Long id = user.getId();
         SendMessage answer = new SendMessage();
         StringBuilder messageTextBuilder = new StringBuilder();
-        // if no arguments, return help
-        if (arguments.length == 0) {
-            messageTextBuilder.append("Usage: /session <session_token>");
-            answer.setChatId(chat.getId().toString());
-            answer.setText(messageTextBuilder.toString());
-        } else {
-            String redirectUrl = arguments[0];
-            nintendoService.bind(id, redirectUrl);
-            answer.setChatId(chat.getId().toString());
-            answer.setText(messageTextBuilder.append("bind success").toString());
-        }
+        nintendoService.nintendo_switch_account(id);
+        answer.setChatId(chat.getId().toString());
+        answer.setText(messageTextBuilder.append("login ns account success").toString());
 
         try {
             absSender.execute(answer);
@@ -51,6 +44,5 @@ public class BindCommand extends OrderedCommand {
             log.error(LOG_TAG, e);
             throw new BusinessException(50001, "telegram execute error", e);
         }
-
     }
 }
