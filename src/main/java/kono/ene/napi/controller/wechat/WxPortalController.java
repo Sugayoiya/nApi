@@ -55,6 +55,7 @@ public class WxPortalController {
             log.error("callBack error", e);
         }
         RedirectView redirectView = new RedirectView();
+        redirectView.setUrl("http://www.baidu.com");
         return redirectView;
     }
 

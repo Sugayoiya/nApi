@@ -9,6 +9,8 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -24,8 +26,25 @@ public class WxMsgService {
 
 
     public WxMpXmlOutMessage scan(WxMpService wxMpService, WxMpXmlMessage wxMpXmlMessage) {
-        // TODO
-        return new TextBuilder().build("请点击链接授权：<a href=\"" + "skipUrl" + "\">登录</a>", wxMpXmlMessage, wxMpService);
+        String fromUser = wxMpXmlMessage.getFromUser();
+//        Integer eventKey = Integer.parseInt(getEventKey(wxMpXmlMessage));
+//        User user = userDao.getByOpenId(fromUser);
+//        if (Objects.nonNull(user) && StringUtils.isNotEmpty(user.getAvatar())) {
+//            //注册且已经授权的用户，直接登录成功
+//            login(user.getId(), eventKey);
+//            return null;
+//        }
+//        if (Objects.isNull(user)) {
+//            //未注册的先注册
+//            userService.register(fromUser);
+//        }
+//        //保存openid和场景code的关系，后续才能通知到前端
+//        OPENID_EVENT_CODE_MAP.put(fromUser, eventKey);
+//        //授权流程,给用户发送授权消息，并且异步通知前端扫码成功
+//        threadPoolTaskExecutor.execute(() -> webSocketService.scanSuccess(eventKey));
+        String skipUrl = String.format(URL, wxMpService.getWxMpConfigStorage().getAppId(), URLEncoder.encode(callback, StandardCharsets.UTF_8));
+//        WxMpXmlOutMessage.TEXT().build();
+        return new TextBuilder().build("请点击链接授权：<a href=\"" + skipUrl + "\">登录</a>", wxMpXmlMessage, wxMpService);
     }
 
     private String getEventKey(WxMpXmlMessage wxMpXmlMessage) {
@@ -41,6 +60,7 @@ public class WxMsgService {
      */
     public void authorize(WxOAuth2UserInfo userInfo) {
         // TODO
+        log.info("用户授权成功，userInfo={}", userInfo);
     }
 
     private void fillUserInfo(Long uid, WxOAuth2UserInfo userInfo) {
