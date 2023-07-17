@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static kono.ene.napi.service.telegram.CallbackConstant.GALLERY;
+import static kono.ene.napi.constant.CallbackConstant.GALLERY;
 
 @Service
 @TelegramCallbackAnnotation(callback = GALLERY)
