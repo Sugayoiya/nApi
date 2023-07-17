@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -41,6 +42,7 @@ import java.util.function.BiConsumer;
  */
 @Slf4j
 @Component
+@ConditionalOnExpression(value = "${nintendo.telegram.enable}")
 public class TelegramCustomBot extends TelegramLongPollingBot implements CommandBot, ICommandRegistry {
     public static final String LOG_TAG = "MIXER_HANDLER";
     private static final Integer CACHE_TIME = 86400;
