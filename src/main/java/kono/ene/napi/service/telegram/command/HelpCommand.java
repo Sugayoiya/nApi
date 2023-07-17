@@ -129,14 +129,14 @@ public class HelpCommand extends ManCommand {
                 IBotCommand command = registry.getRegisteredCommand(arguments[0]);
                 String reply = getManText(command);
                 try {
-                    absSender.execute(SendMessage.builder().chatId(chat.getId()).text(reply).parseMode("HTML").build());
+                    absSender.executeAsync(SendMessage.builder().chatId(chat.getId()).text(reply).parseMode("HTML").build());
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
             } else {
                 String reply = getHelpText(registry);
                 try {
-                    absSender.execute(SendMessage.builder().chatId(chat.getId()).text(reply).parseMode("HTML").build());
+                    absSender.executeAsync(SendMessage.builder().chatId(chat.getId()).text(reply).parseMode("HTML").build());
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }

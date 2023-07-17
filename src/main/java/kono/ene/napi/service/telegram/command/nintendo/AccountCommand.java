@@ -39,7 +39,7 @@ public class AccountCommand extends OrderedCommand {
         answer.setText(messageTextBuilder.append("login ns account success").toString());
 
         try {
-            absSender.execute(answer);
+            absSender.executeAsync(answer);
         } catch (TelegramApiException e) {
             log.error(LOG_TAG, e);
             throw new BusinessException(50001, "telegram execute error", e);
