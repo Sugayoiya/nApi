@@ -7,7 +7,8 @@ import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpDefaultConfigImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import me.chanjar.weixin.mp.config.impl.WxMpRedissonConfigImpl;
+import org.redisson.api.RedissonClient;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,6 @@ import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType.EVENT;
  */
 @AllArgsConstructor
 @Configuration
-@ConditionalOnProperty(prefix = "nintendo.wx", name = "enable", havingValue = "true")
 @EnableConfigurationProperties(WxMpProperties.class)
 public class WxMpConfiguration {
     private final LogHandler logHandler;
@@ -35,6 +35,7 @@ public class WxMpConfiguration {
     private final ScanHandler scanHandler;
     private final WxMpProperties properties;
     private final UnSubscribeHandler unSubscribeHandler;
+    private final RedissonClient redissonClient;
 
     @Bean
     public WxMpService wxMpService() {
@@ -47,7 +48,7 @@ public class WxMpConfiguration {
         service.setMultiConfigStorages(configs
                 .stream().map(a -> {
                     WxMpDefaultConfigImpl configStorage;
-                    configStorage = new WxMpDefaultConfigImpl();
+                    configStorage = new WxMpRedissonConfigImpl(this.redissonClient, a.getName());
 
                     configStorage.setAppId(a.getAppId());
                     configStorage.setSecret(a.getSecret());

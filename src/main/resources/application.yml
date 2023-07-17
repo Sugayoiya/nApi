@@ -56,6 +56,7 @@ wx:
         secret: ${nintendo.wx.secret} # 公众号的appsecret
         token: ${nintendo.wx.token} # 接口配置里的Token值
         aesKey: ${nintendo.wx.aesKey} # 接口配置里的EncodingAESKey值
+        name: ${nintendo.wx.name} # 公众号名称
 
 server:
   port: ${nintendo.server.port}

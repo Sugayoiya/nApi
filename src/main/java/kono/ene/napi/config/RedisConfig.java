@@ -1,7 +1,5 @@
 package kono.ene.napi.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,14 +13,6 @@ import java.util.Objects;
 
 @Configuration
 public class RedisConfig {
-
-    @SneakyThrows
-    public static void main(String[] args) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println(objectMapper.writeValueAsString(1));
-        System.out.println(objectMapper.writeValueAsString("1"));
-        System.out.println(objectMapper.writeValueAsString(Boolean.TRUE));
-    }
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {

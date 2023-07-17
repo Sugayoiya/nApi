@@ -20,10 +20,6 @@ public class WxMpProperties {
     private boolean useRedis;
 
     /**
-     * redis 配置
-     */
-    private RedisConfig redisConfig;
-    /**
      * 多个公众号配置信息
      */
     private List<MpConfig> configs;
@@ -33,28 +29,6 @@ public class WxMpProperties {
         return JSONUtil.toJsonStr(this);
     }
 
-    @Data
-    public static class RedisConfig {
-        /**
-         * redis服务器 主机地址
-         */
-        private String host;
-
-        /**
-         * redis服务器 端口号
-         */
-        private Integer port;
-
-        /**
-         * redis服务器 密码
-         */
-        private String password;
-
-        /**
-         * redis 服务连接超时时间
-         */
-        private Integer timeout;
-    }
 
     @Data
     public static class MpConfig {
@@ -77,5 +51,10 @@ public class WxMpProperties {
          * 设置微信公众号的EncodingAESKey
          */
         private String aesKey;
+
+        /**
+         * 设置微信公众号的名称
+         */
+        private String name;
     }
 }
