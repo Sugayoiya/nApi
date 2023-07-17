@@ -23,9 +23,9 @@ import static kono.ene.napi.service.telegram.CallbackConstant.GALLERY;
 @Service
 @TelegramCallbackAnnotation(callback = GALLERY)
 public class GalleryCallbackInnerServiceImpl implements CallbackInnerService {
-    private final String BACK = "⬅️  Back";
-    private final String NEXT = "Next ➡️";
-    private final String INDEX_OUT_OF_RANGE = "Requested index is out of range!";
+    private static final String BACK = "⬅️  Back";
+    private static final String NEXT = "Next ➡️";
+    private static final String INDEX_OUT_OF_RANGE = "Requested index is out of range!";
     private final ArrayList<String[]> urls = new ArrayList<>(
             Arrays.asList(new String[]{"http://www.elektrollart.de/?p=2964", "http://www.elektrollart.de/wp-content/uploads/deer-724x1024.png", "Deer Nature (cc-by)"},
                     new String[]{"http://www.elektrollart.de/?p=2960", "http://www.elektrollart.de/wp-content/uploads/butterfly_wallpaper_by_elektroll-d424m9d-1024x576.png", "Butterfly Wallpaper (cc-by)"},
