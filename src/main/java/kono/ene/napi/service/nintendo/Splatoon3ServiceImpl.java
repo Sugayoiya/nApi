@@ -15,15 +15,19 @@ import kono.ene.napi.dao.repository.NintendoUserDao;
 import kono.ene.napi.exception.BusinessException;
 import kono.ene.napi.response.splat3.BattleHistoryResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.Document;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static kono.ene.napi.constant.MongoField.*;
 import static kono.ene.napi.constant.SplatoonGraphQL.*;
@@ -39,6 +43,8 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
     private NintendoGlobalConfigDao nintendoGlobalConfigDao;
     @Resource
     private NintendoUserDao nintendoUserDao;
+    @Resource
+    private MongoTemplate mongoTemplate;
     @Resource
     @Qualifier("globalConfigDTO")
     private GlobalConfiguration.GlobalConfigDTO globalConfig;
@@ -84,12 +90,13 @@ public class Splatoon3ServiceImpl implements Splatoon3Service {
                 JSONObject jsonObject = JSONUtil.parseObj(response);
                 log.info("bulletToken response: {}", jsonObject);
                 String bulletToken = jsonObject.getStr("bulletToken");
-                var switchWebAccessTokenDo = switchWebAccessTokenDao.findAndModify(
-                        new Document(QID, qid).append(GAME_ID, SPLATOON3_ID),
-                        new Document("$set", new Document(BULLET_TOKEN, bulletToken))
-                                .append("$currentDate", new Document(UPDATE_TIME, true)),
-                        FindAndModifyOptions.options().returnNew(true).upsert(true));
-                return switchWebAccessTokenDo.getBulletToken();
+                WebAccessTokenDo switchWebAccessTokenDo = mongoTemplate.findAndModify(
+                        new Query(Criteria.where(QID).is(qid).and(GAME_ID).is(SPLATOON3_ID)),
+                        new Update().set(BULLET_TOKEN, bulletToken).currentDate(UPDATE_TIME),
+                        FindAndModifyOptions.options().returnNew(true).upsert(true),
+                        WebAccessTokenDo.class
+                );
+                return Objects.requireNonNull(switchWebAccessTokenDo).getBulletToken();
             } else {
                 throw new BusinessException("bulletToken error: " + httpResponse.getStatus() + " " + httpResponse.body());
             }
