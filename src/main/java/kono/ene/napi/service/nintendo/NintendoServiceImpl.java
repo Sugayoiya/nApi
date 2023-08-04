@@ -70,7 +70,7 @@ public class NintendoServiceImpl implements NintendoService {
     @Override
     public String loginChallenge(Long qid) {
         CodeChallengeDo codeChallengeDo = nintendoCodeChallengeDao.findByQid(qid);
-        if (Objects.isNull(codeChallengeDo) || Objects.isNull(codeChallengeDo.getSessionToken())) {
+        if (!Objects.isNull(codeChallengeDo) && !Objects.isNull(codeChallengeDo.getSessionToken())) {
             return "already bind";
         }
         // Generate a random state value
